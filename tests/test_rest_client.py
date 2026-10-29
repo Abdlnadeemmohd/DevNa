@@ -37,6 +37,13 @@ class RestClientTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     request_json(path, base_url="https://api.example.com")
 
+    def test_get_does_not_accept_a_request_body(self):
+        with self.assertRaisesRegex(ValueError, "GET requests must not include"):
+            request_json(
+                "/items", method="GET", payload={"x": 1},
+                base_url="https://api.example.com",
+            )
+
     def test_write_requires_explicit_confirmation_before_network(self):
         with patch("devna.rest_client.urlopen") as mock_urlopen:
             with self.assertRaisesRegex(ValueError, "explicit confirmation"):
