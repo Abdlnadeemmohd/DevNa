@@ -31,7 +31,7 @@ Health endpoint: `http://127.0.0.1:8000/healthz`
 ## Render deployment
 
 1. In Render, create a new Blueprint from this repository.
-2. Select branch `feature/devna-core-runtime` for initial testing. After the pull request is merged, update the service to the chosen release branch.
+2. Use the reviewed default branch so the Blueprint and live service use the same source version.
 3. Review the `render.yaml` service plan and costs before creating it. The blueprint selects a paid starter service to keep the public endpoint responsive; approve the plan and billing only if you are comfortable with the charge.
 4. Wait for deployment to be healthy.
 5. Verify `https://YOUR-SERVICE.onrender.com/healthz` and use an MCP client to enumerate and test tools at `https://YOUR-SERVICE.onrender.com/mcp`.
