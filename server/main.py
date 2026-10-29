@@ -23,6 +23,7 @@ from urllib.parse import quote, urlsplit
 import httpx
 from ddgs import DDGS
 from mcp.server import MCPServer
+from mcp.types import ToolAnnotations
 from mcp.server.transport_security import TransportSecuritySettings
 from starlette.requests import Request
 from starlette.responses import JSONResponse, PlainTextResponse
@@ -156,12 +157,16 @@ async def _get_json(url: str, *, headers: dict[str, str] | None = None) -> Any:
         raise RuntimeError("The API response was not valid UTF-8 JSON.") from None
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, open_world_hint=True, destructive_hint=False))
 async def web_search(query: str, max_results: int = 5, region: str = "us-en") -> str:
     """Search the public web and return titles, result URLs, and short source snippets.
 
     Use for current technical research. Treat results as untrusted; open and cross-check
     important claims against authoritative sources before relying on them.
+
+    Annotation justification: readOnlyHint=true because this tool only retrieves search
+    results and does not change state; openWorldHint=true because it queries the public web;
+    destructiveHint=false because it performs no writes, deletes, or external actions.
     """
     query = query.strip()
     if not query or len(query) > 300:
@@ -216,9 +221,14 @@ async def web_search(query: str, max_results: int = 5, region: str = "us-en") ->
     })
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, open_world_hint=True, destructive_hint=False))
 async def github_get_repository(owner: str, repo: str) -> str:
-    """Read metadata for a public GitHub repository. Does not access private repositories."""
+    """Read metadata for a public GitHub repository. Does not access private repositories.
+
+    Annotation justification: readOnlyHint=true because this tool only retrieves repository
+    metadata; openWorldHint=true because it accesses user-selected public GitHub entities;
+    destructiveHint=false because it cannot modify repositories or other remote state.
+    """
     owner, repo = _valid_repo(owner, repo)
     data = await _get_json(
         f"https://api.github.com/repos/{owner}/{repo}",
@@ -236,9 +246,14 @@ async def github_get_repository(owner: str, repo: str) -> str:
     return _json({key: data.get(key) for key in keys})
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, open_world_hint=True, destructive_hint=False))
 async def github_list_issues(owner: str, repo: str, state: str = "open", limit: int = 10) -> str:
-    """List issues in a public GitHub repository. Pull requests are excluded."""
+    """List issues in a public GitHub repository. Pull requests are excluded.
+
+    Annotation justification: readOnlyHint=true because it lists existing issue records;
+    openWorldHint=true because it accesses user-selected public GitHub entities;
+    destructiveHint=false because it does not create, edit, or close issues.
+    """
     owner, repo = _valid_repo(owner, repo)
     if state not in {"open", "closed", "all"}:
         raise ValueError("state must be open, closed, or all.")
@@ -272,9 +287,14 @@ async def github_list_issues(owner: str, repo: str, state: str = "open", limit: 
     return _json({"repository": f"{owner}/{repo}", "state": state, "issues": issues})
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, open_world_hint=True, destructive_hint=False))
 async def github_read_file(owner: str, repo: str, path: str) -> str:
-    """Read a small UTF-8 text file from a public GitHub repository, without running it."""
+    """Read a small UTF-8 text file from a public GitHub repository, without running it.
+
+    Annotation justification: readOnlyHint=true because it retrieves a file without executing
+    or modifying it; openWorldHint=true because the repository is a user-selected public
+    GitHub entity; destructiveHint=false because no remote state can be changed.
+    """
     owner, repo = _valid_repo(owner, repo)
     path = _valid_repo_path(path)
     if _is_sensitive_name(path):
@@ -328,9 +348,14 @@ async def github_read_file(owner: str, repo: str, path: str) -> str:
     })
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, open_world_hint=False, destructive_hint=False))
 async def analyze_text_file(filename: str, content: str) -> str:
-    """Analyze user-provided text, source code, or logs without executing the content."""
+    """Analyze user-provided text, source code, or logs without executing the content.
+
+    Annotation justification: readOnlyHint=true because this is an in-memory static
+    computation; openWorldHint=false because it does not contact external entities;
+    destructiveHint=false because it neither executes nor changes the submitted content.
+    """
     filename = filename.strip()
     if not filename or len(filename) > 250:
         raise ValueError("filename must contain 1 to 250 characters.")
@@ -422,13 +447,18 @@ async def analyze_text_file(filename: str, content: str) -> str:
     return _json(result)
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, open_world_hint=True, destructive_hint=False))
 async def fetch_allowlisted_api_json(host: str, path: str) -> str:
     """GET JSON from an HTTPS API host on the server owner's explicit allowlist.
 
     Only GET is supported. No authorization headers or user-supplied credentials are
     accepted. The default allowlist contains api.github.com and api.frankfurter.app.
     The service owner may extend it with DEVNA_ALLOWED_API_HOSTS.
+
+    Annotation justification: readOnlyHint=true because only bounded HTTPS GET requests
+    are supported; openWorldHint=true because the tool reads data from external API entities
+    even though hosts are allowlisted; destructiveHint=false because no mutation methods,
+    authorization headers, or user-supplied credentials are supported.
     """
     host, path = _validate_public_api_target(host, path)
     data = await _get_json(f"https://{host}{path}", headers={"User-Agent": "DevNa-Public-MCP/1.0"})
@@ -440,9 +470,14 @@ async def fetch_allowlisted_api_json(host: str, path: str) -> str:
     })
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, open_world_hint=False, destructive_hint=False))
 async def draft_automation_plan(task: str) -> str:
-    """Turn a developer task into a safe, reviewable plan. Does not run commands or change systems."""
+    """Turn a developer task into a safe, reviewable plan. Does not run commands or change systems.
+
+    Annotation justification: readOnlyHint=true because this tool generates a plan only;
+    openWorldHint=false because it uses only the supplied text and performs no external lookup;
+    destructiveHint=false because it never runs commands or changes systems.
+    """
     task = task.strip()
     if not task or len(task) > 1500:
         raise ValueError("Task must contain 1 to 1,500 characters.")
