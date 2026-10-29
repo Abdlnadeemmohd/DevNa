@@ -35,7 +35,8 @@ Health endpoint: `http://127.0.0.1:8000/healthz`
 3. Review the `render.yaml` service plan and costs before creating it.
 4. Wait for deployment to be healthy.
 5. Verify `https://YOUR-SERVICE.onrender.com/healthz` and use an MCP client to enumerate and test tools at `https://YOUR-SERVICE.onrender.com/mcp`.
-6. Replace the placeholder in `public-plugin/mcp.json.template` with the actual stable HTTPS endpoint, then create the upload ZIP.
+6. For publisher domain verification, set the exact token shown by the plugin portal as the Render environment variable `OPENAI_APPS_CHALLENGE`. The server then serves it as plain text at `/.well-known/openai-apps-challenge`. Keep the token in the hosting dashboard, never in Git.
+7. Replace the placeholder in `public-plugin/mcp.json.template` with the actual stable HTTPS endpoint, then create the upload ZIP.
 
 The service name can be unavailable or changed by Render. Do not upload the plugin package while its MCP URL still contains a placeholder.
 
