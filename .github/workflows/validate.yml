@@ -1,0 +1,51 @@
+name: Validate DevNa
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Validate plugin manifests
+        run: |
+          python -m json.tool plugin.json > /dev/null
+          python -m json.tool .codex-plugin/plugin.json > /dev/null
+
+      - name: Install package
+        run: python -m pip install .
+
+      - name: Compile source and tests
+        run: python -m compileall -q src tests
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Smoke-test CLI
+        run: |
+          devna --version
+          devna check
+          devna automate verify --root .
