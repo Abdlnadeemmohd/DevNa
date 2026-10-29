@@ -1,6 +1,6 @@
 # DevNa Terms of Use
 
-**Effective date:** The date this version is first published.
+**Effective date:** October 29, 2026.
 
 By using DevNa, you agree to these terms. If you do not agree, do not use the service.
 
