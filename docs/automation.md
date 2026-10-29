@@ -18,6 +18,10 @@ The plan validates both plugin manifests as JSON, compiles source and tests, and
 
 The GitHub Actions workflow runs on pushes, pull requests, and manual dispatch. It checks supported Python versions, validates manifests, installs the package, compiles code, runs tests, and smoke-tests the CLI. The workflow has read-only repository permissions.
 
+## Safety notes
+
+The generic REST client requires a trusted HTTPS base URL in `DEVNA_API_BASE_URL`. It supports JSON over GET/POST/PUT/PATCH/DELETE; mutating methods need `--confirm-write` and `DEVNA_API_TOKEN`. It does not automatically schedule jobs or run in the background.
+
 ## Not yet implemented
 
 - Scheduling jobs in the background.
