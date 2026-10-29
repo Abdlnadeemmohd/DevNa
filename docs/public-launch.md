@@ -22,7 +22,7 @@ It intentionally has no private-repository access, write operations, arbitrary s
 ## Deployment and cost control
 
 1. Read `server/README.md` and inspect `render.yaml`.
-2. Open Render, connect this GitHub repository, and create a Blueprint using the feature branch for initial testing.
+2. Merge the reviewed source PR after all required CI checks pass. Then open Render, connect this GitHub repository, and create a Blueprint from default branch `Abd`.
 3. Review the service plan, billing, and current provider terms before creating any service. The current blueprint selects a starter service to avoid a sleep-prone public endpoint. Do not create a paid service unless you approve the cost.
 4. Deploy the service, then check `/healthz`.
 5. Test the Streamable HTTP MCP endpoint at `/mcp` with a compatible MCP client and manually test each positive/negative case in the package manifest.
