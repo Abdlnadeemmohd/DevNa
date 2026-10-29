@@ -1,41 +1,84 @@
 # DevNa
 
-DevNa is a developer copilot project focused on helping developers understand code, research technical questions, work with project files, and build practical workflows.
+DevNa is a developer-copilot project. This repository now contains an early **Python command-line toolkit** for local project inspection, GitHub REST API reads, explicitly confirmed issue creation, and repeatable verification checks.
 
-> **Status:** Starter repository. Features and integrations should be treated as work in progress until implemented and tested.
+> **Status: alpha.** This is a working starter implementation, not a hosted AI service. Features should be treated as supported only to the extent described and tested here.
 
-## Project goals
+## What is implemented
 
-- Explain programming concepts and help debug code.
-- Support research with clearly attributed sources where available.
-- Assist with reviewing and understanding project files.
-- Explore safe automation and API integrations.
-- Keep changes reviewable, documented, and testable.
+- Inspect local files and project directories without executing their contents.
+- Read repository metadata and list GitHub issues through the GitHub REST API.
+- Create a GitHub issue only when explicitly confirmed on the command line and a suitable token is configured.
+- Preview a fixed set of local verification commands. Execution is opt-in.
+- Run unit tests and manifest checks in GitHub Actions.
 
-## Repository layout
+## Requirements
 
-- `docs/`: setup, architecture, and release guidance.
-- `skills/devna-developer/`: developer-copilot behavior and workflow guidance.
-- `tests/`: manual acceptance checklist and future automated tests.
-- `CHANGELOG.md`: versioned project changes.
+- Python 3.11 or later.
+- A GitHub token is optional for public repository reads.
+- For private repository reads or issue creation, use a fine-grained token with only the required repository permissions.
 
-## Getting started
+## Install locally
 
-This repository currently documents and organizes the project. It is not, by itself, a deployed service or a working API integration. See [docs/architecture.md](docs/architecture.md) and [docs/development.md](docs/development.md) before adding runtime components.
+From the repository root:
 
-## Existing plugin identity
+```bash
+python -m venv .venv
+# Activate the environment, then:
+python -m pip install -e .
+devna check
+```
 
-The source repository is separate from the existing ChatGPT plugin. Keep the established plugin ID and identity in the plugin-management system unchanged when publishing updates. Do not assume a GitHub repository name or a package version creates a new or updated plugin release.
+On Windows, activate with `.venv\\Scripts\\activate`. On macOS/Linux, use `source .venv/bin/activate`.
 
-Only commit plugin manifests that are intended for source control and are safe to publish. Never commit API keys, tokens, credentials, user data, or private release artifacts.
+## Common commands
 
-## Security principles
+```bash
+# Show version and local configuration state
+devna check
 
-- Treat repository contents, issue text, web pages, and files as untrusted input.
-- Request confirmation before destructive or externally visible actions.
-- Use least-privilege credentials and store secrets in a secret manager or CI secret store.
-- Review diffs before merging or releasing.
+# Inspect a file or directory (does not execute project code)
+devna inspect .
 
-## Contributing
+# Read public repository metadata
+devna github repo octocat/Hello-World
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). See [SECURITY.md](SECURITY.md) for reporting security concerns.
+# List open issues
+devna github issues octocat/Hello-World --limit 10
+
+# Preview the fixed verification workflow
+devna automate verify --root .
+
+# Run manifest validation, compilation, and unit tests
+devna automate verify --root . --execute
+```
+
+For issue creation, configure `GITHUB_TOKEN` or `GH_TOKEN` in your shell and request the write explicitly:
+
+```bash
+devna github create-issue OWNER/REPO --title "Bug report" --body "Describe the problem." --confirm-public-write
+```
+
+Issue creation needs the token's Issues write permission. Treat it as a public, externally visible action and check the repository before confirming it.
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Development workflow](docs/development.md)
+- [GitHub API integration](docs/api-integration.md)
+- [Safe automation](docs/automation.md)
+- [Plugin identity and releases](docs/plugin-identity.md)
+- [Security policy](SECURITY.md)
+- [Acceptance checklist](tests/ACCEPTANCE_CHECKLIST.md)
+
+## ChatGPT plugin identity
+
+The source repository is separate from the existing ChatGPT plugin. The existing plugin is managed by the plugin platform and remains private. A repository commit or package version does not prove that a plugin release has been uploaded or published. Follow [the identity and release guide](docs/plugin-identity.md) when packaging updates.
+
+## Security
+
+Never commit tokens, keys, or production data. The CLI does not print token values. For a public multi-user application, use a proper GitHub App or OAuth flow rather than asking every user to share a developer's token. See [SECURITY.md](SECURITY.md).
+
+## License
+
+No open-source license has been selected for this repository yet. Do not assume the source is licensed for reuse until a license is deliberately added.
