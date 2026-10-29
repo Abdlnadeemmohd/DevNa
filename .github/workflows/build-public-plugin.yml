@@ -1,0 +1,49 @@
+name: Build public DevNa plugin ZIP
+
+on:
+  workflow_dispatch:
+    inputs:
+      mcp_url:
+        description: "Deployed, stable HTTPS MCP endpoint ending in /mcp"
+        required: true
+        type: string
+      demo_recording_url:
+        description: "Publicly accessible HTTPS link to the actual demo recording"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Validate and package public submission
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.13"
+
+      - name: Validate public plugin metadata
+        run: python scripts/validate_public_plugin.py
+
+      - name: Scan public payload for secrets
+        run: python scripts/check_public_secrets.py
+
+      - name: Build ZIP after live health check
+        env:
+          DEVNA_MCP_URL: ${{ inputs.mcp_url }}
+          DEVNA_DEMO_RECORDING_URL: ${{ inputs.demo_recording_url }}
+        run: python scripts/build_public_plugin.py
+
+      - name: Upload submission ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: devna-public-plugin-1.0.0
+          path: dist/devna-public-1.0.0.zip
+          if-no-files-found: error
+          retention-days: 14
