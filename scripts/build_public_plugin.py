@@ -22,18 +22,20 @@ PACKAGE = ROOT / "public-plugin"
 OUTPUT = ROOT / "dist" / "devna-public-1.0.0.zip"
 
 
-def require_https(value: str, label: str) -> str:
+def require_https(value: str, label: str, *, allow_query_fragment: bool = False) -> str:
     parsed = urlsplit(value)
     if (
         parsed.scheme != "https"
         or not parsed.hostname
         or parsed.username is not None
         or parsed.password is not None
-        or parsed.query
-        or parsed.fragment
+        or (not allow_query_fragment and (parsed.query or parsed.fragment))
     ):
-        raise SystemExit(f"{label} must be a valid HTTPS URL without credentials, query, or fragment.")
-    return value.rstrip("/")
+        suffix = " without credentials, query, or fragment" if not allow_query_fragment else " without embedded credentials"
+        raise SystemExit(f"{label} must be a valid HTTPS URL{suffix}.")
+    # Video hosts commonly encode the recording ID in a query parameter. Preserve that URL
+    # exactly; only normalize a trailing slash for the MCP endpoint.
+    return value if allow_query_fragment else value.rstrip("/")
 
 
 def verify_endpoint(mcp_url: str) -> None:
@@ -60,7 +62,7 @@ def main() -> int:
     if not mcp_url or not demo_url:
         raise SystemExit("Set both DEVNA_MCP_URL and DEVNA_DEMO_RECORDING_URL before building the upload ZIP.")
     mcp_url = require_https(mcp_url, "DEVNA_MCP_URL")
-    demo_url = require_https(demo_url, "DEVNA_DEMO_RECORDING_URL")
+    demo_url = require_https(demo_url, "DEVNA_DEMO_RECORDING_URL", allow_query_fragment=True)
     verify_endpoint(mcp_url)
 
     subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_public_plugin.py")], check=True)

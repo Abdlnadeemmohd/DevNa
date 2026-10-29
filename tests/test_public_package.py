@@ -14,6 +14,21 @@ class PublicPackageBuilderTests(unittest.TestCase):
             "https://devna.example.org/mcp",
         )
 
+    def test_demo_url_accepts_standard_video_query_parameters(self):
+        url = "https://youtu.be/AbCdEfG1234?feature=share"
+        self.assertEqual(
+            require_https(url, "Demo URL", allow_query_fragment=True),
+            url,
+        )
+
+    def test_demo_url_still_rejects_embedded_credentials(self):
+        with self.assertRaises(SystemExit):
+            require_https(
+                "https://user:password@video.example/watch?v=AbCdEfG1234",
+                "Demo URL",
+                allow_query_fragment=True,
+            )
+
     def test_require_https_rejects_http_and_embedded_credentials(self):
         for url in (
             "http://devna.example.org/mcp",
