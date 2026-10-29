@@ -1,36 +1,47 @@
 # DevNa Privacy Policy
 
-**Draft for publisher review.** Before submitting, review this policy against the actual hosting provider, search providers, deployment settings, and any monitoring configured for the service.
+**Effective date:** The date this version is first published.
 
-## What DevNa processes
+DevNa provides public web search, public GitHub repository inspection, static analysis of user-submitted text, read-only JSON requests to a configured allowlist of public HTTPS APIs, and automation planning.
 
-DevNa processes the information necessary to answer tool requests, including:
-- Search queries submitted to the web-search tool.
-- Public GitHub repository names and file paths.
-- Text, source snippets, JSON, and logs that a user submits for static analysis.
-- API host/path parameters for allowlisted read-only JSON requests.
-- Automation task descriptions submitted for planning.
+## Information processed
 
-Do not submit passwords, access tokens, private keys, production secrets, customer records, or other sensitive data. The service refuses some sensitive filename patterns, but users remain responsible for the content they provide.
+When you use DevNa, the service may process:
+- Your search queries.
+- Public GitHub owner/repository names, issue requests, and requested public file paths.
+- Text, code, JSON, CSV/TSV content, and logs you provide for static analysis.
+- An API hostname and relative path for an allowlisted public JSON request.
+- A task description you submit for an automation plan.
+- Basic connection information processed by the hosting platform, such as request metadata, timing, and operational logs.
 
-## How information is used
+Do not provide passwords, access tokens, private keys, confidential source code, production secrets, customer records, health data, or other sensitive information. The tool has filename and size safeguards, but those safeguards are not a substitute for your judgment.
 
-The service uses tool inputs to make the requested search or public API read, or to perform static analysis in memory. The application code is designed not to persist tool input or output and does not intentionally log submitted source content. Hosting providers may retain operational logs and metadata under their own retention and security policies.
+## How the service uses information
 
-Web-search queries are passed to the search backend used by the `ddgs` library and may be processed under that provider's policies. Public GitHub requests go to GitHub's API. Allowlisted API calls go to the configured public HTTPS host.
+The server uses the request content to provide the selected tool result. The application code has no user-content database and does not intentionally write tool inputs or outputs to persistent storage. Transient processing happens in memory. The hosting platform may process connection metadata and operational logs according to its own policy and configuration.
 
-## Credentials
+The web-search tool sends the query to the search backend used by the `ddgs` library. Public GitHub lookups are sent to GitHub's public API. Requests to other services are limited to the public HTTPS hosts explicitly allowlisted by the service operator.
 
-The public MCP server does not ask users to provide tokens and does not accept user-supplied authorization headers. It does not access private GitHub repositories or perform remote write operations.
+## What the service does not do
+
+The public version does not accept user-supplied API credentials, access private GitHub repositories, create or edit GitHub content, write to external APIs, execute submitted code, execute shell commands, or schedule background tasks.
+
+## Third-party services
+
+GitHub, the web-search backend, the hosting provider, and any configured allowlisted API host are third-party services. Their operators may process requests under their own privacy policies and terms. DevNa does not control their retention, availability, or independent handling of data. Search results and API responses may be incomplete or inaccurate.
 
 ## Retention and security
 
-DevNa does not intentionally store tool inputs in an application database. The deployment operator and hosting provider may process connection metadata and service logs. No public internet service can promise zero risk, and users should avoid sending sensitive content.
+DevNa's application code does not maintain a persistent store of user tool content. Hosting infrastructure and upstream providers may retain operational records under their own policies. No public internet service can guarantee zero risk. Avoid sending sensitive material and use only public sample data where possible.
 
-## Children and contact
+## Children
 
-DevNa is a general-purpose developer tool and is not intended to collect data from children. For support or privacy questions, use the repository's issue page: https://github.com/Abdlnadeemmohd/DevNa/issues. Do not include private or sensitive data in public issues.
+DevNa is a general-purpose developer tool and is not designed for children.
+
+## Contact
+
+For questions or concerns, use the support page at https://github.com/Abdlnadeemmohd/DevNa/issues. Do not include passwords, tokens, private keys, or other sensitive information in a public issue.
 
 ## Changes
 
-This policy may be updated to reflect the final deployment and operational practices. The publisher should update this page before launch if actual data handling differs from this description.
+This policy may be updated when data flows, features, or hosting arrangements change. The published version should accurately reflect the actual configuration and behavior of the deployed service.
