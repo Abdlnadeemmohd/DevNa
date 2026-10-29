@@ -3,14 +3,7 @@
   "mcpServers": {
     "devna": {
       "type": "streamable-http",
-      "url": "https://REPLACE-WITH-YOUR-STABLE-MCP-HOST/mcp",
-      "extensions": {
-        "com.openai": {
-          "auth": {
-            "type": "none"
-          }
-        }
-      }
+      "url": "https://REPLACE-WITH-YOUR-STABLE-MCP-HOST/mcp"
     }
   }
 }
