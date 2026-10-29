@@ -4,9 +4,11 @@
 
 - [x] Local CLI package installs, compiles, and runs its unit tests on Python 3.11, 3.12, 3.13, and 3.14.
 - [x] Plugin source manifests are valid JSON and aligned.
-- [x] Public package template manifest and listing metadata validate.
+- [x] Public package template manifest, test-case counts, onboarding skills, and SVG icon structure validate.
+- [x] Public payload secret scan checks server and package files for token/key material and private plugin backend IDs.
+- [x] Public ZIP builder validates required environment inputs and a live health endpoint before producing an artifact.
 - [x] Public MCP server imports on Python 3.13.
-- [x] Public MCP server safety tests pass.
+- [x] Public MCP server safety tests pass, including host allowlisting, unsafe search-link filtering, protected paths, CSV/TSV summary behavior, MCP tool discovery, and domain challenge response.
 - [x] GitHub public repository metadata can be read by the CLI smoke test.
 - [x] Public package includes five positive and three negative test cases.
 - [x] Package builder refuses to build without both the deployed MCP URL and an actual demo URL.
@@ -20,7 +22,7 @@
 - [ ] Configure and verify the final allowed API host list.
 - [ ] Test web search against live sources and confirm errors/rate-limit behavior.
 - [ ] Test live GitHub repository metadata, issue listing, and small file reads from ChatGPT via the connected MCP server.
-- [ ] Test static text/JSON/Python analysis and safe automation planning via ChatGPT.
+- [ ] Test static text/JSON/Python/CSV/TSV analysis and safe automation planning via ChatGPT.
 - [ ] If the portal requests domain verification, set `OPENAI_APPS_CHALLENGE` through the hosting dashboard and verify the exact plain-text response.
 - [ ] Record an accessible demo video showing real positive and negative use cases.
 - [ ] Review the privacy policy and terms against the actual host/search providers and intended operating jurisdictions.
