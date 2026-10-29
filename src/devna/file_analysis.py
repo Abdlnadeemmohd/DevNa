@@ -67,11 +67,11 @@ def _file_record(path: Path, display_path: str, *, read_text: bool) -> dict[str,
 def analyze_path(value: str | Path) -> dict[str, Any]:
     """Inspect a file or directory while skipping common build folders and secrets."""
     raw_path = Path(value).expanduser()
+    if raw_path.is_symlink():
+        raise ValueError("Refusing to inspect a symbolic link.")
     if not raw_path.exists():
         raise ValueError("The requested path does not exist.")
     root = raw_path.resolve()
-    if root.is_symlink():
-        raise ValueError("Refusing to inspect a symbolic link.")
     if root.is_file():
         return {
             "kind": "file",
