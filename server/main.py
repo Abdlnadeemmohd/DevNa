@@ -16,7 +16,7 @@ import re
 import time
 from pathlib import PurePosixPath
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 import httpx
 from ddgs import DDGS
@@ -175,15 +175,25 @@ async def web_search(query: str, max_results: int = 5, region: str = "us-en") ->
             max_results=max_results,
             backend="auto",
         )
-        return [
-            {
+        results = []
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            url = str(item.get("href", "")).strip()
+            parsed = urlsplit(url)
+            if (
+                parsed.scheme not in {"https", "http"}
+                or not parsed.hostname
+                or parsed.username is not None
+                or parsed.password is not None
+            ):
+                continue
+            results.append({
                 "title": str(item.get("title", ""))[:300],
-                "url": str(item.get("href", ""))[:1000],
+                "url": url[:1000],
                 "snippet": str(item.get("body", ""))[:1200],
-            }
-            for item in raw
-            if isinstance(item, dict) and item.get("href")
-        ]
+            })
+        return results
 
     try:
         results = await asyncio.wait_for(asyncio.to_thread(search), timeout=HTTP_TIMEOUT + 3)
@@ -263,7 +273,10 @@ async def github_read_file(owner: str, repo: str, path: str) -> str:
     """Read a small UTF-8 text file from a public GitHub repository, without running it."""
     owner, repo = _valid_repo(owner, repo)
     path = _valid_repo_path(path)
-    response_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+    if _is_sensitive_name(path):
+        raise ValueError("DevNa refuses to read repository paths whose filenames suggest secrets or private keys.")
+    encoded_path = quote(path, safe="/")
+    response_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{encoded_path}"
     async with httpx.AsyncClient(
         timeout=HTTP_TIMEOUT,
         follow_redirects=False,
@@ -281,9 +294,14 @@ async def github_read_file(owner: str, repo: str, path: str) -> str:
             if response.status_code == 404:
                 raise RuntimeError("The public file was not found.")
             response.raise_for_status()
-            raw = await response.aread()
-            if len(raw) > MAX_GITHUB_FILE_BYTES * 2:
-                raise RuntimeError("GitHub response is too large to inspect safely.")
+            chunks: list[bytes] = []
+            size = 0
+            async for chunk in response.aiter_bytes():
+                size += len(chunk)
+                if size > MAX_GITHUB_FILE_BYTES * 2:
+                    raise RuntimeError("GitHub response is too large to inspect safely.")
+                chunks.append(chunk)
+            raw = b"".join(chunks)
     data = json.loads(raw.decode("utf-8"))
     if not isinstance(data, dict) or data.get("type") != "file":
         raise ValueError("Path must identify a single file, not a directory or symlink.")
