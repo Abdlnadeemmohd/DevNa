@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">DevNa</title>
+  <desc id="desc">Geometric teal D with connected node paths on a deep navy background.</desc>
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="#101E2B"/>
+  <path d="M157 118h82c99 0 155 54 155 138S338 394 239 394h-82V118zm74 60v156h15c57 0 88-26 88-78s-31-78-88-78h-15z" fill="#59DCC7"/>
+  <path d="M106 256h64M341 256h65" fill="none" stroke="#C5FFF3" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="98" cy="256" r="16" fill="#C5FFF3"/>
+  <circle cx="414" cy="256" r="16" fill="#C5FFF3"/>
+</svg>
