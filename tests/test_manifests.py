@@ -15,7 +15,7 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(standard["name"], "devna")
         self.assertEqual(codex["name"], "devna")
         self.assertEqual(standard["version"], codex["version"])
-        self.assertEqual(standard["version"], "1.0.1")
+        self.assertEqual(standard["version"], "1.0.2")
         self.assertEqual(codex["interface"]["displayName"], "DevNa")
 
     def test_public_manifests_do_not_embed_private_plugin_identity_or_email(self):
