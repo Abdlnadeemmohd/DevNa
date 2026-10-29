@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "devna-public-copilot",
   "version": "1.0.0",
-  "description": "A beginner-friendly developer copilot for public web research, public GitHub repository inspection, static text analysis, read-only API access, and safe automation planning.",
+  "description": "A beginner-friendly developer copilot for public web research, public GitHub repository inspection, static analysis of text and tabular data, read-only API access, and safe automation planning.",
   "author": {
     "name": "Abdul Nadeem Mohd",
     "url": "https://github.com/Abdlnadeemmohd"
@@ -24,21 +24,21 @@
       "interface": {
         "displayName": "DevNa",
         "shortDescription": "Code, research & repo tools",
-        "longDescription": "DevNa helps developers research technical questions, inspect public GitHub repositories and issues, read public source files, statically analyze pasted text and logs, query a small allowlist of read-only HTTPS JSON APIs, and plan safe automation. It does not access private repositories, accept user tokens, modify repositories, execute shell commands, or run background jobs. File analysis is static and bounded. Web search results should be verified against the linked source pages.",
+        "longDescription": "DevNa helps developers research technical questions, inspect public GitHub repositories and issues, read public source files, statically analyze pasted text, JSON, Python syntax, logs, and CSV/TSV structure, query a small allowlist of read-only HTTPS JSON APIs, and plan safe automation. It does not access private repositories, accept user tokens, modify repositories, execute shell commands, or run background jobs. File analysis is static and bounded. Web search results should be verified against the linked source pages.",
         "developerName": "Abdul Nadeem Mohd",
         "category": "Developer Tools",
         "capabilities": [
           "Search the public web and return source links",
           "Inspect public GitHub repository metadata and issues",
           "Read small text files from public GitHub repositories",
-          "Analyze pasted text, JSON, Python syntax, and logs without execution",
+          "Analyze pasted text, JSON, Python syntax, logs, and CSV/TSV structure without execution",
           "Fetch JSON from allowlisted HTTPS APIs using read-only GET requests",
           "Draft reviewable automation plans without running commands"
         ],
         "websiteURL": "https://github.com/Abdlnadeemmohd/DevNa",
         "supportURL": "https://github.com/Abdlnadeemmohd/DevNa/issues",
-        "privacyPolicyURL": "https://github.com/Abdlnadeemmohd/DevNa/blob/feature/devna-core-runtime/public-plugin/PRIVACY.md",
-        "termsOfServiceURL": "https://github.com/Abdlnadeemmohd/DevNa/blob/feature/devna-core-runtime/public-plugin/TERMS.md",
+        "privacyPolicyURL": "https://github.com/Abdlnadeemmohd/DevNa/blob/Abd/public-plugin/PRIVACY.md",
+        "termsOfServiceURL": "https://github.com/Abdlnadeemmohd/DevNa/blob/Abd/public-plugin/TERMS.md",
         "defaultPrompt": [
           "Research this technical question and cite useful sources.",
           "Inspect this public GitHub repository and summarize its risks.",
