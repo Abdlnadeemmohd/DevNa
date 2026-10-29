@@ -1,89 +1,76 @@
 # DevNa
 
-DevNa is a developer-copilot project. This repository now contains an early **Python command-line toolkit** for local project inspection, GitHub REST API reads, explicitly confirmed issue creation, and repeatable verification checks.
+DevNa is a developer-copilot project with a local Python CLI and a public MCP-server submission package in progress.
 
-> **Status: alpha.** This is a working starter implementation, not a hosted AI service. Features should be treated as supported only to the extent described and tested here.
+> **Status: public-release candidate, not yet published.** The CLI and MCP server pass automated CI checks. The public MCP endpoint still needs deployment, live end-to-end validation, an accessible demo recording, and submission through OpenAI's portal.
 
-## What is implemented
+## Current components
 
-- Inspect local files and project directories without executing their contents.
-- Read repository metadata and list GitHub issues through the GitHub REST API.
-- Create a GitHub issue only when explicitly confirmed on the command line and a suitable token is configured.
-- Preview a fixed set of local verification commands. Execution is opt-in.
-- Run unit tests and manifest checks in GitHub Actions.
+### Public MCP server source
 
-## Requirements
+The server under `server/` exposes these bounded tools through MCP Streamable HTTP:
 
-- Python 3.11 or later.
-- A GitHub token is optional for public repository reads.
-- For private repository reads or issue creation, use a fine-grained token with only the required repository permissions.
+- Public web search with source links and snippets.
+- Public GitHub repository metadata, issue listing, and small UTF-8 text-file reads.
+- Static analysis of user-provided text, JSON, Python syntax, and logs.
+- Read-only JSON GET to a server-owner allowlist of HTTPS API hosts.
+- Reviewable automation planning without execution.
 
-## Install locally
+It intentionally does **not** access private repositories, accept user tokens, modify remote systems, execute shell commands, or run background jobs. Those capabilities require a user-authenticated design and additional security work.
 
-From the repository root:
+### Local Python CLI
+
+The package under `src/devna/` supports local file/project metadata inspection, GitHub repository and issue reads, explicitly confirmed issue creation, a configurable local HTTPS JSON client, and a fixed dry-run-first verification plan.
+
+Install and run locally:
 
 ```bash
 python -m venv .venv
 # Activate the environment, then:
 python -m pip install -e .
 devna check
-```
-
-On Windows, activate with `.venv\\Scripts\\activate`. On macOS/Linux, use `source .venv/bin/activate`.
-
-## Common commands
-
-```bash
-# Show version and local configuration state
-devna check
-
-# Inspect a file or directory (does not execute project code)
 devna inspect .
-
-# Read public repository metadata
 devna github repo octocat/Hello-World
-
-# List open issues
 devna github issues octocat/Hello-World --limit 10
-
-# Call a trusted HTTPS JSON API (configure DEVNA_API_BASE_URL)
-devna api GET /v1/items
-
-# Preview the fixed verification workflow
 devna automate verify --root .
-
-# Run manifest validation, compilation, and unit tests
-devna automate verify --root . --execute
 ```
 
-For a generic JSON API, set `DEVNA_API_BASE_URL` to its trusted HTTPS base URL. Set `DEVNA_API_TOKEN` only when that API needs bearer-token authentication. Read-only requests use the `devna api GET /path` command. Requests that change remote state require `--confirm-write`; see [API integration](docs/api-integration.md).
+For private repository access or issue creation, configure a least-privilege GitHub token in `GITHUB_TOKEN` or `GH_TOKEN` locally. Never commit credentials.
 
-For GitHub issue creation, configure `GITHUB_TOKEN` or `GH_TOKEN` in your shell and request the write explicitly:
+## Public plugin package
+
+The separate submission package lives in [`public-plugin/`](public-plugin/). It includes the manifest, five skills, listing icons, draft privacy/terms pages, and five positive/three negative reviewer cases. `mcp.json.template` intentionally contains a placeholder until the server has a real URL.
+
+The final ZIP must be built after the server is deployed and a demo has actually been recorded:
 
 ```bash
-devna github create-issue OWNER/REPO --title "Bug report" --body "Describe the problem." --confirm-public-write
+python scripts/validate_public_plugin.py
+# Set DEVNA_MCP_URL and DEVNA_DEMO_RECORDING_URL first:
+python scripts/build_public_plugin.py
 ```
 
-Issue creation needs the token's Issues write permission. Treat it as a public, externally visible action and check the repository before confirming it.
+Read the [public launch checklist](docs/public-launch.md). The builder refuses to package while the live HTTPS endpoint or actual demo URL is missing.
+
+## Existing ChatGPT plugin identity
+
+The existing private ChatGPT plugin remains **version 1.0.2** with its existing identity. OpenAI's current public-submission guidance says a server cannot be added later to an existing skills-only plugin, so the tool-enabled public version requires a separate first submission. The current private plugin is not automatically made public.
+
+## Verification
+
+GitHub Actions tests:
+- The local CLI/package on Python 3.11, 3.12, 3.13, and 3.14.
+- The public MCP server package/import and server safety tests on Python 3.13.
+- Public GitHub REST read smoke test.
+- Manifest and public package metadata shape.
+
+These checks do not prove that the remote server is deployed or that the plugin has been reviewed in ChatGPT. The deployment, connected MCP scan, real end-user flow tests, identity verification, and publication are still required.
 
 ## Documentation
 
 - [Architecture](docs/architecture.md)
 - [Development workflow](docs/development.md)
 - [GitHub API integration](docs/api-integration.md)
-- [Safe automation](docs/automation.md)
-- [Plugin identity and releases](docs/plugin-identity.md)
+- [Automation](docs/automation.md)
+- [Public release checklist](docs/public-launch.md)
+- [Plugin identity and existing-release workflow](docs/plugin-identity.md)
 - [Security policy](SECURITY.md)
-- [Acceptance checklist](tests/ACCEPTANCE_CHECKLIST.md)
-
-## ChatGPT plugin identity
-
-The source repository is separate from the existing ChatGPT plugin. The existing plugin is managed by the plugin platform and remains private. A repository commit or package version does not prove that a plugin release has been uploaded or published. Follow [the identity and release guide](docs/plugin-identity.md) when packaging updates.
-
-## Security
-
-Never commit tokens, keys, or production data. The CLI does not print token values. For a public multi-user application, use a proper GitHub App or OAuth flow rather than asking every user to share a developer's token. See [SECURITY.md](SECURITY.md).
-
-## License
-
-No open-source license has been selected for this repository yet. Do not assume the source is licensed for reuse until a license is deliberately added.
