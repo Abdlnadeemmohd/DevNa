@@ -6,7 +6,7 @@ This folder is the **public-directory submission package template** for DevNa. I
 
 - Web search with result URLs and snippets.
 - Public GitHub repository metadata, issue listing, and small UTF-8 file reads.
-- Static analysis of user-provided JSON, Python snippets, text, and logs.
+- Static analysis of user-provided JSON, Python snippets, text, logs, and CSV/TSV structure.
 - Read-only JSON GET requests to a server-owner allowlist of HTTPS API hosts.
 - Reviewable automation plans that do not execute commands.
 
