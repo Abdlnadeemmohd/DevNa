@@ -130,6 +130,38 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.body.decode("utf-8"), "portal-verification-token")
 
+    async def test_public_web_search_returns_structured_source_links(self):
+        class FakeDDGS:
+            def __init__(self, timeout):
+                self.timeout = timeout
+            def text(self, query, **kwargs):
+                return [{"title": "Official Python docs", "href": "https://docs.python.org/3/library/asyncio.html", "body": "Task and timeout docs"}]
+        with patch("server.main.DDGS", FakeDDGS):
+            result = json.loads(await web_search("asyncio timeouts", max_results=3))
+        self.assertEqual(result["result_count"], 1)
+        self.assertEqual(result["results"][0]["url"], "https://docs.python.org/3/library/asyncio.html")
+        self.assertIn("verify", result["note"])
+
+    async def test_github_repository_tool_uses_public_data_fields(self):
+        from unittest.mock import AsyncMock
+        from server.main import github_get_repository
+        payload = {"full_name": "octocat/Hello-World", "default_branch": "main", "private": False, "secret": "must not be returned"}
+        with patch("server.main._get_json", new=AsyncMock(return_value=payload)):
+            result = json.loads(await github_get_repository("octocat", "Hello-World"))
+        self.assertEqual(result["full_name"], "octocat/Hello-World")
+        self.assertEqual(result["default_branch"], "main")
+        self.assertNotIn("secret", result)
+
+    async def test_allowlisted_api_tool_is_read_only_and_returns_data(self):
+        from unittest.mock import AsyncMock
+        from server.main import fetch_allowlisted_api_json
+        payload = {"rates": {"USD": 1.0}}
+        with patch("server.main._get_json", new=AsyncMock(return_value=payload)) as mocked:
+            result = json.loads(await fetch_allowlisted_api_json("api.frankfurter.app", "/latest?from=USD"))
+        self.assertEqual(result["data"], payload)
+        mocked.assert_awaited_once()
+        self.assertEqual(mocked.await_args.args[0], "https://api.frankfurter.app/latest?from=USD")
+
     async def test_web_search_validates_arguments_before_network(self):
         with self.assertRaises(ValueError):
             await web_search("")
