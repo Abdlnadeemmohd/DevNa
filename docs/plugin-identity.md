@@ -19,3 +19,10 @@ Do not use a create-new-plugin workflow for an update. Do not treat a Git commit
 ## Public-repository precautions
 
 This repository is public. Do not commit personal email addresses, credentials, private release archives, or the plugin platform's backend ID. Keep that ID in the plugin platform or another private record. The public repository can contain source files while the ChatGPT plugin itself remains private.
+
+
+## Public listing architecture
+
+The current plugin remains a private, skills-only plugin at version 1.0.2. OpenAI's current public-submission documentation says an MCP server cannot be added later to an existing skills-only plugin. The full public MCP version is therefore prepared as a separate initial submission package at `public-plugin/`, with a new package identifier `devna-public-copilot` and the same user-facing display name, DevNa.
+
+This does not delete, rename, or expose the existing private plugin. The public package is not an OpenAI listing until you upload it, connect the deployed endpoint, complete publisher verification and review, and choose Publish after approval.
