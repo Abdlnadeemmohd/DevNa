@@ -21,6 +21,7 @@ The file `mcp.json.template` has a placeholder endpoint. The final upload packag
 2. Verifying `/healthz` and testing MCP tools at `/mcp`.
 3. Running the positive and negative test cases against the live endpoint.
 4. Recording an accessible demo walkthrough.
+5. Completing developer identity verification and reviewing the privacy/terms drafts.
 5. Reviewing the privacy policy and terms.
 
 From the repository root, the release builder requires the live MCP and demo URLs:
