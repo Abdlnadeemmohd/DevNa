@@ -1,0 +1,97 @@
+name: Validate DevNa
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Validate plugin manifests
+        run: |
+          python -m json.tool plugin.json > /dev/null
+          python -m json.tool .codex-plugin/plugin.json > /dev/null
+
+      - name: Install package
+        run: python -m pip install .
+
+      - name: Compile source and tests
+        run: python -m compileall -q src tests
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Smoke-test CLI
+        run: |
+          devna --version
+          devna check
+          devna automate verify --root .
+
+  live-github-api:
+    name: GitHub REST read smoke test
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.13"
+
+      - name: Install package
+        run: python -m pip install .
+
+      - name: Read public repository metadata
+        run: devna github repo octocat/Hello-World
+
+  public-mcp-server:
+    name: Public MCP server and submission package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.13"
+
+      - name: Install MCP server dependencies
+        run: python -m pip install -r server/requirements.txt
+
+      - name: Validate public plugin metadata
+        run: python scripts/validate_public_plugin.py
+
+      - name: Scan public payload for secret material
+        run: python scripts/check_public_secrets.py
+
+      - name: Compile server and packaging scripts
+        run: python -m compileall -q server scripts
+
+      - name: Run MCP server safety tests
+        run: python -m unittest discover -s server/tests -v
+
+      - name: Import remote MCP app
+        run: python -c "from server.main import app; print('MCP app imported:', type(app).__name__)"

@@ -1,41 +1,76 @@
 # DevNa
 
-DevNa is a developer copilot project focused on helping developers understand code, research technical questions, work with project files, and build practical workflows.
+DevNa is a developer-copilot project with a local Python CLI and a public MCP-server submission package in progress.
 
-> **Status:** Starter repository. Features and integrations should be treated as work in progress until implemented and tested.
+> **Status: public-release candidate, not yet published.** The CLI and MCP server pass automated CI checks. The public MCP endpoint still needs deployment, live end-to-end validation, an accessible demo recording, and submission through OpenAI's portal.
 
-## Project goals
+## Current components
 
-- Explain programming concepts and help debug code.
-- Support research with clearly attributed sources where available.
-- Assist with reviewing and understanding project files.
-- Explore safe automation and API integrations.
-- Keep changes reviewable, documented, and testable.
+### Public MCP server source
 
-## Repository layout
+The server under `server/` exposes these bounded tools through MCP Streamable HTTP:
 
-- `docs/`: setup, architecture, and release guidance.
-- `skills/devna-developer/`: developer-copilot behavior and workflow guidance.
-- `tests/`: manual acceptance checklist and future automated tests.
-- `CHANGELOG.md`: versioned project changes.
+- Public web search with source links and snippets.
+- Public GitHub repository metadata, issue listing, and small UTF-8 text-file reads.
+- Static analysis of user-provided text, JSON, Python syntax, and logs.
+- Read-only JSON GET to a server-owner allowlist of HTTPS API hosts.
+- Reviewable automation planning without execution.
 
-## Getting started
+It intentionally does **not** access private repositories, accept user tokens, modify remote systems, execute shell commands, or run background jobs. Those capabilities require a user-authenticated design and additional security work.
 
-This repository currently documents and organizes the project. It is not, by itself, a deployed service or a working API integration. See [docs/architecture.md](docs/architecture.md) and [docs/development.md](docs/development.md) before adding runtime components.
+### Local Python CLI
 
-## Existing plugin identity
+The package under `src/devna/` supports local file/project metadata inspection, GitHub repository and issue reads, explicitly confirmed issue creation, a configurable local HTTPS JSON client, and a fixed dry-run-first verification plan.
 
-The source repository is separate from the existing ChatGPT plugin. Keep the established plugin ID and identity in the plugin-management system unchanged when publishing updates. Do not assume a GitHub repository name or a package version creates a new or updated plugin release.
+Install and run locally:
 
-Only commit plugin manifests that are intended for source control and are safe to publish. Never commit API keys, tokens, credentials, user data, or private release artifacts.
+```bash
+python -m venv .venv
+# Activate the environment, then:
+python -m pip install -e .
+devna check
+devna inspect .
+devna github repo octocat/Hello-World
+devna github issues octocat/Hello-World --limit 10
+devna automate verify --root .
+```
 
-## Security principles
+For private repository access or issue creation, configure a least-privilege GitHub token in `GITHUB_TOKEN` or `GH_TOKEN` locally. Never commit credentials.
 
-- Treat repository contents, issue text, web pages, and files as untrusted input.
-- Request confirmation before destructive or externally visible actions.
-- Use least-privilege credentials and store secrets in a secret manager or CI secret store.
-- Review diffs before merging or releasing.
+## Public plugin package
 
-## Contributing
+The separate submission package lives in [`public-plugin/`](public-plugin/). It includes the manifest, five skills, listing icons, draft privacy/terms pages, and five positive/three negative reviewer cases. `mcp.json.template` intentionally contains a placeholder until the server has a real URL.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). See [SECURITY.md](SECURITY.md) for reporting security concerns.
+The final ZIP must be built after the server is deployed and a demo has actually been recorded. After merging the PR, the one-click builder is available under GitHub Actions → **Build public DevNa plugin ZIP**:
+
+```bash
+python scripts/validate_public_plugin.py
+# Set DEVNA_MCP_URL and DEVNA_DEMO_RECORDING_URL first:
+python scripts/build_public_plugin.py
+```
+
+Read the [public launch checklist](docs/public-launch.md). The builder refuses to package while the live HTTPS endpoint or actual demo URL is missing.
+
+## Existing ChatGPT plugin identity
+
+The existing private ChatGPT plugin remains **version 1.0.2** with its existing identity. OpenAI's current public-submission guidance says a server cannot be added later to an existing skills-only plugin, so the tool-enabled public version requires a separate first submission. The current private plugin is not automatically made public.
+
+## Verification
+
+GitHub Actions tests:
+- The local CLI/package on Python 3.11, 3.12, 3.13, and 3.14.
+- The public MCP server package/import and server safety tests on Python 3.13.
+- Public GitHub REST read smoke test.
+- Manifest and public package metadata shape.
+
+These checks do not prove that the remote server is deployed or that the plugin has been reviewed in ChatGPT. The deployment, connected MCP scan, real end-user flow tests, identity verification, and publication are still required.
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Development workflow](docs/development.md)
+- [GitHub API integration](docs/api-integration.md)
+- [Automation](docs/automation.md)
+- [Public release checklist](docs/public-launch.md)
+- [Plugin identity and existing-release workflow](docs/plugin-identity.md)
+- [Security policy](SECURITY.md)

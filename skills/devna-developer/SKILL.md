@@ -76,3 +76,18 @@ For simple questions, answer directly. Use beginner-friendly explanations and de
 
 ## Capability limits
 This plugin provides reusable instructions, not a GitHub credential or an API server. Live repository inspection and writes require a connected GitHub tool or configured MCP server with appropriate permissions. Browsing, file access, and background execution likewise depend on available tools.
+
+## DevNa local toolkit reference
+
+The public source repository `Abdlnadeemmohd/DevNa` contains an alpha Python CLI. It is separate from this ChatGPT plugin and is not automatically installed in the user's environment.
+
+Commands available when the user has installed the repository package:
+- `devna check`: show local version and whether a GitHub token environment variable is configured, without printing token values.
+- `devna inspect PATH`: inspect file or directory metadata without executing project files.
+- `devna github repo OWNER/REPO` and `devna github issues OWNER/REPO`: read GitHub metadata/issues.
+- `devna github create-issue OWNER/REPO --title "..." --confirm-public-write`: create an issue only when a token and explicit confirmation are supplied.
+- `devna api GET /path`: call a trusted HTTPS JSON API configured through `DEVNA_API_BASE_URL`.
+- `devna api POST /path --json-file payload.json --confirm-write`: external API writes require explicit confirmation and a token in `DEVNA_API_TOKEN`.
+- `devna automate verify --root .`: dry-run a fixed verification plan; `--execute` runs those fixed checks.
+
+Do not assume any CLI command has been installed or executed unless the user or an available tool confirms it. Do not claim a hosted API, background scheduler, general-purpose web research service, or complete document parsing pipeline exists. For public multi-user integrations, recommend user-specific GitHub App/OAuth authorization instead of sharing one developer's token.
