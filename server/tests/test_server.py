@@ -8,12 +8,14 @@ from unittest.mock import patch
 
 from server.main import (
     _is_sensitive_name,
+    _mcp_transport_security,
     _valid_repo,
     _valid_repo_path,
     _validate_public_api_target,
     analyze_text_file,
     draft_automation_plan,
     web_search,
+    mcp,
 )
 
 
@@ -51,6 +53,18 @@ class PublicMCPValidationTests(unittest.TestCase):
                 ("api.example.test", "/v1/status"),
             )
 
+    def test_transport_security_uses_render_external_hostname(self):
+        from mcp.server.transport_security import TransportSecuritySettings
+        with patch.dict(os.environ, {"RENDER_EXTERNAL_HOSTNAME": "devna-example.onrender.com"}, clear=True):
+            settings = _mcp_transport_security()
+        self.assertIsInstance(settings, TransportSecuritySettings)
+        self.assertEqual(settings.allowed_hosts, ["devna-example.onrender.com", "devna-example.onrender.com:*"])
+
+    def test_transport_security_rejects_bad_hostname(self):
+        with patch.dict(os.environ, {"DEVNA_PUBLIC_HOST": "https://evil.example/mcp", "RENDER_EXTERNAL_HOSTNAME": ""}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "hostname"):
+                _mcp_transport_security()
+
     def test_sensitive_names_are_blocked(self):
         for name in (".env", ".env.production", "id_rsa", "private.key", "secrets.yaml", "credentials.json"):
             with self.subTest(name=name):
@@ -59,6 +73,21 @@ class PublicMCPValidationTests(unittest.TestCase):
 
 
 class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
+    async def test_mcp_server_exposes_expected_tool_names(self):
+        from mcp import Client
+        async with Client(mcp) as client:
+            listed = await client.list_tools()
+        names = {tool.name for tool in listed.tools}
+        self.assertEqual(names, {
+            "web_search",
+            "github_get_repository",
+            "github_list_issues",
+            "github_read_file",
+            "analyze_text_file",
+            "fetch_allowlisted_api_json",
+            "draft_automation_plan",
+        })
+
     async def test_analyze_json_without_echoing_input(self):
         content = '{"ok": true}\n'
         result = json.loads(await analyze_text_file("config.json", content))
