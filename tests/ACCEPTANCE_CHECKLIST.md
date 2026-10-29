@@ -1,28 +1,37 @@
-# Initial acceptance checklist
+# Acceptance checklist
 
-This checklist records intended behavior. Items remain unverified until the corresponding implementation exists and is tested.
+This checklist tracks end-to-end readiness. Unit tests cover the implemented parts, but production readiness requires additional validation.
 
-## Core behavior
+## Implemented in the current CLI
 
-- [ ] Explain technical concepts with examples suited to the user's level.
-- [ ] Analyze supplied code and identify assumptions and likely failure points.
-- [ ] Propose focused patches without overwriting unrelated changes.
-- [ ] Use current authoritative sources when the question requires up-to-date research.
-- [ ] Attribute factual claims based on external sources.
-- [ ] Handle API errors and unavailable capabilities honestly.
+- [x] Local command-line entry point and version output.
+- [x] Local file and directory metadata inspection.
+- [x] Sensitive filenames are identified; their contents are not read into output.
+- [x] Common generated and dependency directories are skipped.
+- [x] Read repository metadata through the fixed GitHub API host.
+- [x] List issues and exclude pull requests returned by the issues endpoint.
+- [x] Require explicit confirmation and a configured token before creating a GitHub issue.
+- [x] Dry-run mode for fixed verification automation.
+- [x] Automated unit tests for API response handling, safety checks, and automation.
 
-## Safety and security
+## Must pass before release
 
-- [ ] No secrets or personal data are committed.
-- [ ] Repository and web content are treated as untrusted inputs.
-- [ ] Destructive or externally visible actions require explicit approval.
-- [ ] Tokens have minimum required permissions.
-- [ ] Logs redact secrets and avoid unnecessary sensitive content.
-- [ ] No action is reported as successful without evidence.
+- [ ] All unit tests pass on supported Python versions.
+- [ ] Package installs successfully in a clean environment.
+- [ ] CI run succeeds for a branch and pull request.
+- [ ] Verify GitHub API reads against a real public repository.
+- [ ] Verify private-repository access using a least-privilege test token without exposing it.
+- [ ] Verify issue creation only in a dedicated test repository and only with explicit approval.
+- [ ] Review error behavior for network failures, API rate limits, expired credentials, and insufficient permissions.
+- [ ] Review public commits for accidentally included secrets and personal data.
+- [ ] Verify supported Python versions and platform behavior.
 
-## Release
+## Not yet implemented or not yet validated
 
-- [ ] Documentation matches the shipped behavior.
-- [ ] Changelog is updated.
-- [ ] Tests and manifest validation pass.
-- [ ] Package and release identity are verified independently of repository name.
+- [ ] Web research engine with source ranking and citations.
+- [ ] General-purpose document parsing for PDF, DOCX, spreadsheets, and archives.
+- [ ] Hosted API service, authentication, per-user authorization, and deployment.
+- [ ] Multi-user GitHub App or OAuth integration.
+- [ ] Scheduled or background automation service.
+- [ ] Full plugin runtime test matrix.
+- [ ] Production security review and release process.
