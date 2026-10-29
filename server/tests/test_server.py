@@ -97,7 +97,7 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn(content, json.dumps(result))
 
     async def test_analyze_csv_returns_aggregate_summary_without_echoing_cells(self):
-        content = "name,city\\nAlice,Hyderabad\\nBob,Delhi\\n,Alice\\n"
+        content = "name,city\nAlice,Hyderabad\nBob,Delhi\n,Alice\n"
         result = json.loads(await analyze_text_file("users.csv", content))
         self.assertTrue(result["tabular_valid"])
         self.assertEqual(result["header_column_count"], 2)
@@ -108,7 +108,7 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("Hyderabad", json.dumps(result))
 
     async def test_analyze_tsv_uses_tab_delimiter(self):
-        content = "name\\tcity\\nAlice\\tHyderabad\\n"
+        content = "name\tcity\nAlice\tHyderabad\n"
         result = json.loads(await analyze_text_file("users.tsv", content))
         self.assertTrue(result["tabular_valid"])
         self.assertEqual(result["header_column_count"], 2)
