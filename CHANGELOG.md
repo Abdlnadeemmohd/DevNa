@@ -9,6 +9,7 @@ Notable repository changes are documented here.
 - Add a dry-run-first local verification workflow.
 - Add unit tests and a GitHub Actions validation workflow.
 - Keep plugin platform identity and source repository metadata separate.
+- Update the existing private ChatGPT plugin in place to version 1.0.2.
 
 ## 0.1.0
 
