@@ -1,27 +1,32 @@
 # Architecture
 
-## Current state
+## Current implementation
 
-This repository is an initial documentation scaffold. It does not yet define a deployed backend, API server, data store, or production integrations. Add those components only when requirements and a deployment model have been chosen.
+The repository contains an early Python CLI package under `src/devna/`. It currently provides:
+- A command-line entry point.
+- A GitHub REST API client restricted to the fixed `api.github.com` host.
+- Metadata-first inspection of local files and folders.
+- A predefined verification plan that defaults to dry-run.
+- Unit tests and CI validation.
 
-## Suggested logical boundaries
+It is not a hosted AI model, web application, database-backed service, or background worker.
 
-1. **Conversation and orchestration:** interpret the developer's request and select a capability.
-2. **Code and file assistance:** inspect supplied project material, explain changes, and propose patches.
-3. **Research:** gather external information where web access is available and distinguish sourced facts from inference.
-4. **Integrations:** call explicitly configured APIs using scoped credentials.
-5. **Safety and approvals:** validate inputs, minimize permissions, and require confirmation for consequential external or destructive actions.
-6. **Observability:** record operational events without logging secrets or unnecessary user content.
+## Logical components
 
-These are design recommendations, not claims that the components have already been implemented.
+1. **CLI:** parses user intent and prints structured JSON results.
+2. **GitHub client:** reads repository metadata and issues; issue creation requires a token and explicit confirmation.
+3. **File inspection:** reports metadata and selected text-file characteristics without executing project code. Directory scans skip common build folders and do not read sensitive filenames.
+4. **Verification automation:** exposes a fixed list of checks. It does not accept arbitrary shell commands from users.
+5. **Tests and CI:** unit tests run with Python's standard library; GitHub Actions validates manifests, syntax, tests, and package installation.
 
 ## Trust boundaries
 
-- Repository files, uploaded files, issue text, webpages, and API responses are untrusted data.
-- Secrets must be provided through a secure configuration mechanism, not checked into Git.
-- External actions should be previewed and confirmed when they are destructive, irreversible, public, or affect third parties.
-- Logs should redact credentials and avoid collecting unnecessary sensitive data.
+- Local project files, web content, issue text, and API responses are untrusted input.
+- Tokens must come from environment variables or a secret manager and must never be committed.
+- Write operations must remain explicit and auditable.
+- The local inspector does not execute source files.
+- The GitHub API client does not accept arbitrary API hosts or methods outside its supported allowlist.
 
-## Plugin identity
+## Future work
 
-Keep ChatGPT plugin identity and release management separate from GitHub source control. Do not overwrite the established plugin ID or claim a plugin release has changed based only on commits in this repository.
+A hosted, multi-user DevNa product would need an authenticated server, per-user authorization, an appropriate GitHub App/OAuth flow, rate limiting, audit logging, deployment configuration, and privacy controls. None of those are implied by this CLI starter.
