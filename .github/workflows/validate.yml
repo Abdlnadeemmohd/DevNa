@@ -65,3 +65,30 @@ jobs:
 
       - name: Read public repository metadata
         run: devna github repo octocat/Hello-World
+
+  public-mcp-server:
+    name: Public MCP server and submission package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.13"
+
+      - name: Install MCP server dependencies
+        run: python -m pip install -r server/requirements.txt
+
+      - name: Validate public plugin metadata
+        run: python scripts/validate_public_plugin.py
+
+      - name: Compile server and packaging scripts
+        run: python -m compileall -q server scripts
+
+      - name: Run MCP server safety tests
+        run: python -m unittest discover -s server/tests -v
+
+      - name: Import remote MCP app
+        run: python -c "from server.main import app; print('MCP app imported:', type(app).__name__)"
