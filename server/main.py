@@ -21,6 +21,7 @@ from urllib.parse import urlsplit
 import httpx
 from ddgs import DDGS
 from mcp.server import MCPServer
+from mcp.server.transport_security import TransportSecuritySettings
 from starlette.requests import Request
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
@@ -31,6 +32,7 @@ MAX_GITHUB_FILE_BYTES = 180_000
 MAX_API_RESPONSE_BYTES = 1_000_000
 HTTP_TIMEOUT = 12.0
 _NAME_PART = re.compile(r"^[A-Za-z0-9_.-]{1,100}$")
+_HOSTNAME = re.compile(r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$")
 _REGION = re.compile(r"^[a-z]{2}-[a-z]{2}$")
 SENSITIVE_NAMES = {
     ".env", ".netrc", ".npmrc", ".pypirc", "credentials.json", "secrets.json",
@@ -70,6 +72,16 @@ def _valid_repo_path(path: str) -> str:
     ):
         raise ValueError("Provide a relative repository file path without '.' or '..' segments.")
     return value
+
+
+def _mcp_transport_security() -> TransportSecuritySettings | None:
+    """Allow only the configured deployed hostname; keep localhost protections by default."""
+    host = (os.getenv("DEVNA_PUBLIC_HOST") or os.getenv("RENDER_EXTERNAL_HOSTNAME") or "").strip().lower().rstrip(".")
+    if not host:
+        return None
+    if not _HOSTNAME.fullmatch(host):
+        raise RuntimeError("DEVNA_PUBLIC_HOST must be a hostname without scheme, path, or port.")
+    return TransportSecuritySettings(allowed_hosts=[host, f"{host}:*"])
 
 
 def _api_allowlist() -> set[str]:
@@ -396,7 +408,7 @@ async def openai_domain_challenge(_request: Request) -> PlainTextResponse:
     return PlainTextResponse(token, media_type="text/plain")
 
 
-app = mcp.streamable_http_app()
+app = mcp.streamable_http_app(transport_security=_mcp_transport_security())
 app.routes.append(Route("/healthz", health_check, methods=["GET"]))
 app.routes.append(Route("/.well-known/openai-apps-challenge", openai_domain_challenge, methods=["GET"]))
 app.routes.append(Route("/", health_check, methods=["GET"]))
