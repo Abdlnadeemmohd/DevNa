@@ -1,0 +1,16 @@
+{
+  "description": "A practical developer copilot for coding, GitHub workflows, technical research, file analysis, safe automation, and API integration.",
+  "interface": {
+    "capabilities": [],
+    "category": "Developer tools",
+    "defaultPrompt": "Help me work on a software project. Explain steps for beginners, use GitHub workflows when available, and never claim an action succeeded unless a connected tool confirms it.",
+    "developerName": "Abdul Nadeem Mohd",
+    "displayName": "DevNa",
+    "longDescription": "DevNa helps developers debug code, understand repositories, plan GitHub issues and pull requests, analyze project files, research technical documentation, and design safe API integrations and automations. Live GitHub operations require a connected GitHub integration.",
+    "shortDescription": "Beginner-friendly coding, GitHub, API, and automation copilot."
+  },
+  "keywords": [],
+  "name": "devna",
+  "skills": "./skills",
+  "version": "1.0.1"
+}
