@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "description": "A practical developer copilot for coding, GitHub workflows, technical research, file analysis, safe automation, and API integration.",
+  "name": "devna",
+  "version": "1.0.1"
+}
