@@ -76,7 +76,8 @@ def _valid_repo_path(path: str) -> str:
 
 def _mcp_transport_security() -> TransportSecuritySettings | None:
     """Allow only the configured deployed hostname; keep localhost protections by default."""
-    host = (os.getenv("DEVNA_PUBLIC_HOST") or os.getenv("RENDER_EXTERNAL_HOSTNAME") or "").strip().lower().rstrip(".")
+    # Prefer the deployment platform's hostname over optional user-supplied configuration.
+    host = (os.getenv("RENDER_EXTERNAL_HOSTNAME") or os.getenv("DEVNA_PUBLIC_HOST") or "").strip().lower().rstrip(".")
     if not host:
         return None
     if not _HOSTNAME.fullmatch(host):
