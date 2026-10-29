@@ -1,6 +1,6 @@
 # DevNa Privacy Policy
 
-**Effective date:** The date this version is first published.
+**Effective date:** October 29, 2026.
 
 DevNa provides public web search, public GitHub repository inspection, static analysis of user-submitted text, read-only JSON requests to a configured allowlist of public HTTPS APIs, and automation planning.
 
