@@ -130,17 +130,29 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.body.decode("utf-8"), "portal-verification-token")
 
-    async def test_public_web_search_returns_structured_source_links(self):
+    async def test_public_web_search_returns_only_safe_source_links(self):
         class FakeDDGS:
             def __init__(self, timeout):
                 self.timeout = timeout
             def text(self, query, **kwargs):
-                return [{"title": "Official Python docs", "href": "https://docs.python.org/3/library/asyncio.html", "body": "Task and timeout docs"}]
+                return [
+                    {"title": "Official Python docs", "href": "https://docs.python.org/3/library/asyncio.html", "body": "Task and timeout docs"},
+                    {"title": "Bad scheme", "href": "javascript:alert(1)", "body": "unsafe"},
+                    {"title": "Credential URL", "href": "https://user:pass@example.org/page", "body": "unsafe"},
+                    {"title": "No host", "href": "https:///missing.example", "body": "unsafe"},
+                ]
         with patch("server.main.DDGS", FakeDDGS):
             result = json.loads(await web_search("asyncio timeouts", max_results=3))
         self.assertEqual(result["result_count"], 1)
         self.assertEqual(result["results"][0]["url"], "https://docs.python.org/3/library/asyncio.html")
         self.assertIn("verify", result["note"].lower())
+
+    async def test_github_read_file_refuses_sensitive_paths_before_network(self):
+        from server.main import github_read_file
+        with self.assertRaisesRegex(ValueError, "secret"):
+            await github_read_file("octocat", "Hello-World", "config/.env.production")
+        with self.assertRaisesRegex(ValueError, "private keys"):
+            await github_read_file("octocat", "Hello-World", "private.pem")
 
     async def test_github_repository_tool_uses_public_data_fields(self):
         from unittest.mock import AsyncMock
