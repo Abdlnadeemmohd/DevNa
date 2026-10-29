@@ -1,37 +1,41 @@
 # Acceptance checklist
 
-This checklist tracks end-to-end readiness. Unit tests cover the implemented parts, but production readiness requires additional validation.
+## Verified in CI
 
-## Implemented in the current CLI
+- [x] Local CLI package installs, compiles, and runs its unit tests on Python 3.11, 3.12, 3.13, and 3.14.
+- [x] Plugin source manifests are valid JSON and aligned.
+- [x] Public package template manifest and listing metadata validate.
+- [x] Public MCP server imports on Python 3.13.
+- [x] Public MCP server safety tests pass.
+- [x] GitHub public repository metadata can be read by the CLI smoke test.
+- [x] Public package includes five positive and three negative test cases.
+- [x] Package builder refuses to build without both the deployed MCP URL and an actual demo URL.
+- [x] Server provides a configurable plain-text domain challenge route for the OpenAI publishing portal.
+- [x] Existing private plugin was updated in place to v1.0.2 and its identity and private visibility were re-verified.
 
-- [x] Local command-line entry point and version output.
-- [x] Local file and directory metadata inspection.
-- [x] Sensitive filenames are identified; their contents are not read into output.
-- [x] Common generated and dependency directories are skipped.
-- [x] Read repository metadata through the fixed GitHub API host.
-- [x] List issues and exclude pull requests returned by the issues endpoint.
-- [x] Require explicit confirmation and a configured token before creating a GitHub issue.
-- [x] Dry-run mode for fixed verification automation.
-- [x] Automated unit tests for API response handling, safety checks, and automation.
+## Required before public submission
 
-## Must pass before release
+- [ ] Deploy the MCP server at a stable public HTTPS host under the publisher's account.
+- [ ] Verify `/healthz` and test Streamable HTTP at `/mcp` using an MCP client.
+- [ ] Configure and verify the final allowed API host list.
+- [ ] Test web search against live sources and confirm errors/rate-limit behavior.
+- [ ] Test live GitHub repository metadata, issue listing, and small file reads from ChatGPT via the connected MCP server.
+- [ ] Test static text/JSON/Python analysis and safe automation planning via ChatGPT.
+- [ ] If the portal requests domain verification, set `OPENAI_APPS_CHALLENGE` through the hosting dashboard and verify the exact plain-text response.
+- [ ] Record an accessible demo video showing real positive and negative use cases.
+- [ ] Review the privacy policy and terms against the actual host/search providers and intended operating jurisdictions.
+- [ ] Complete publisher identity verification and policy attestations in the OpenAI Platform.
+- [ ] Build the final ZIP by setting `DEVNA_MCP_URL` and `DEVNA_DEMO_RECORDING_URL`; inspect its contents and upload it to the public submission portal.
+- [ ] Run all five positive and three negative test cases against the live endpoint in the portal.
+- [ ] Submit for review, resolve findings, receive approval, and then select Publish.
 
-- [x] All unit tests pass on supported Python versions (3.11, 3.12, 3.13, and 3.14).
-- [x] Package installs successfully in a clean environment via CI.
-- [x] CI run succeeds for a branch push and pull request.
-- [x] Verify GitHub API reads against a real public repository (live CI smoke test succeeded against `octocat/Hello-World`).
-- [ ] Verify private-repository access using a least-privilege test token without exposing it.
-- [ ] Verify issue creation only in a dedicated test repository and only with explicit approval.
-- [ ] Review error behavior for network failures, API rate limits, expired credentials, and insufficient permissions.
-- [ ] Review public commits for accidentally included secrets and personal data.
-- [ ] Verify supported Python versions and platform behavior.
+## Not implemented in the public server
 
-## Not yet implemented or not yet validated
+- [ ] OAuth/GitHub App authentication for private repository access.
+- [ ] GitHub issue/PR/repository writes.
+- [ ] General API write actions.
+- [ ] Shell execution, deployments, or background scheduling.
+- [ ] Full PDF, DOCX, and spreadsheet parsing in the MCP server.
+- [ ] Production monitoring/abuse controls review beyond bounded inputs and fixed API allowlists.
 
-- [ ] Web research engine with source ranking and citations.
-- [ ] General-purpose document parsing for PDF, DOCX, spreadsheets, and archives.
-- [ ] Hosted API service, authentication, per-user authorization, and deployment.
-- [ ] Multi-user GitHub App or OAuth integration.
-- [ ] Scheduled or background automation service.
-- [ ] Full plugin runtime test matrix.
-- [ ] Production security review and release process.
+A green CI run is necessary but not sufficient for public launch.
