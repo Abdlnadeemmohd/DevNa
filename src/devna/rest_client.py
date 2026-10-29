@@ -17,6 +17,11 @@ MAX_RESPONSE_BYTES = 2_000_000
 ALLOWED_METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE"}
 
 
+class RestAPIError(RuntimeError):
+    """Safe, user-facing error from a configured REST API."""
+
+
+
 def _validated_base_url(value: str | None) -> str:
     base = (value or os.environ.get("DEVNA_API_BASE_URL") or "").strip().rstrip("/")
     if not base:
@@ -52,6 +57,8 @@ def request_json(
         raise ValueError("API path must be a local absolute path under the configured base URL.")
     if timeout < 1 or timeout > 60:
         raise ValueError("Timeout must be between 1 and 60 seconds.")
+    if method == "GET" and payload is not None:
+        raise ValueError("GET requests must not include a JSON request body.")
     is_write = method != "GET"
     if is_write and not confirmed:
         raise ValueError("API write requests require explicit confirmation.")
@@ -77,7 +84,7 @@ def request_json(
         with urlopen(request, timeout=timeout) as response:
             raw = response.read(MAX_RESPONSE_BYTES + 1)
             if len(raw) > MAX_RESPONSE_BYTES:
-                raise RuntimeError("API response exceeded the size limit.")
+                raise RestAPIError("API response exceeded the size limit.")
     except HTTPError as exc:
         safe_message = {
             401: "API rejected the credentials.",
@@ -85,15 +92,15 @@ def request_json(
             404: "API endpoint not found or not accessible.",
             429: "API rate limit reached. Wait before retrying.",
         }.get(exc.code, f"API request failed with HTTP {exc.code}.")
-        raise RuntimeError(safe_message) from None
+        raise RestAPIError(safe_message) from None
     except URLError:
-        raise RuntimeError("Could not connect to the configured API. Check the network and base URL.") from None
+        raise RestAPIError("Could not connect to the configured API. Check the network and base URL.") from None
     except TimeoutError:
-        raise RuntimeError("API request timed out. Try again later.") from None
+        raise RestAPIError("API request timed out. Try again later.") from None
 
     if not raw:
         return {}
     try:
         return json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError):
-        raise RuntimeError("The configured API returned a non-JSON response.") from None
+        raise RestAPIError("The configured API returned a non-JSON response.") from None
