@@ -32,7 +32,7 @@ MAX_GITHUB_FILE_BYTES = 180_000
 MAX_API_RESPONSE_BYTES = 1_000_000
 HTTP_TIMEOUT = 12.0
 _NAME_PART = re.compile(r"^[A-Za-z0-9_.-]{1,100}$")
-_HOSTNAME = re.compile(r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$")
+_HOSTNAME = re.compile(r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$")
 _REGION = re.compile(r"^[a-z]{2}-[a-z]{2}$")
 SENSITIVE_NAMES = {
     ".env", ".netrc", ".npmrc", ".pypirc", "credentials.json", "secrets.json",
