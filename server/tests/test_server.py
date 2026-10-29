@@ -89,6 +89,8 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
         })
 
     async def test_tool_annotations_are_explicit_and_justified(self):
+        from mcp import Client
+
         async with Client(mcp) as client:
             listed = await client.list_tools()
         expected = {
