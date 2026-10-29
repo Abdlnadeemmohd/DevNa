@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -62,6 +63,7 @@ def main() -> int:
     demo_url = require_https(demo_url, "DEVNA_DEMO_RECORDING_URL")
     verify_endpoint(mcp_url)
 
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "validate_public_plugin.py")], check=True)
     manifest = json.loads((PACKAGE / "plugin.json").read_text(encoding="utf-8"))
     ext = manifest.setdefault("extensions", {}).setdefault("com.openai", {})
     ext.setdefault("review", {})["demo_recording_url"] = demo_url
@@ -80,6 +82,17 @@ def main() -> int:
             if "__pycache__" in path.parts or path.suffix in {".pyc"}:
                 continue
             archive.write(path, path.relative_to(PACKAGE).as_posix())
+    with zipfile.ZipFile(OUTPUT, "r") as archive:
+        bad_member = archive.testzip()
+        if bad_member:
+            raise SystemExit(f"ZIP integrity check failed at {bad_member}.")
+        names = set(archive.namelist())
+        if "mcp.json" not in names or "mcp.json.template" in names:
+            raise SystemExit("ZIP must contain the generated mcp.json and exclude its template.")
+        packed_manifest = json.loads(archive.read("plugin.json").decode("utf-8"))
+        packed_review = packed_manifest["extensions"]["com.openai"]["review"]
+        if not packed_review.get("demo_recording_url"):
+            raise SystemExit("The upload ZIP does not contain the real demo recording URL.")
     print(f"Built {OUTPUT}")
     print("Review the contents and run the positive/negative cases against the live service before upload.")
     return 0
