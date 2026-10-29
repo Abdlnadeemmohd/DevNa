@@ -1,27 +1,35 @@
-# DevNa Terms of Service
+# DevNa Terms of Use
 
-**Draft for publisher review.** These terms are a practical starting point, not legal advice. Review them for the jurisdictions and hosting model in which the service will operate before public submission.
+**Effective date:** The date this version is first published.
+
+By using DevNa, you agree to these terms. If you do not agree, do not use the service.
 
 ## Service scope
 
-DevNa provides public web search, public GitHub data inspection, static analysis of user-provided text, read-only requests to an operator-configured allowlist of HTTPS APIs, and automation planning. The service does not promise access to private repositories, remote writes, command execution, deployment, scheduled tasks, or a hosted AI model.
+DevNa is a developer copilot tool service that offers public web search, inspection of public GitHub metadata/issues/files, static analysis of user-submitted text, read-only JSON access to an operator-configured allowlist of public HTTPS APIs, and automation planning.
 
-## Acceptable use
+The public service does not provide private repository access, remote write actions, command execution, production deployments, or background scheduling. Do not rely on DevNa as a hosted AI model or as a replacement for your own testing and review.
 
-Do not use DevNa to access systems or data without authorization, send secrets, evade service restrictions, interfere with other users, or automate destructive or unlawful activity. You are responsible for having the rights and permissions needed to submit text or request access to public third-party services.
+## Your responsibilities
 
-## Third-party services
+You are responsible for having the rights and permissions necessary to submit content or request information. Do not submit passwords, access tokens, private keys, confidential customer data, production secrets, or other sensitive information. Do not use the service to violate law, access systems without authorization, interfere with others, or evade third-party rate limits or terms.
 
-Web search, GitHub, hosting, and allowlisted APIs are operated by third parties. Their availability, content, privacy policies, terms, and rate limits may apply. DevNa may return incomplete, stale, or incorrect results. Verify important information against authoritative source material.
+## Third-party services and results
+
+DevNa requests public data from third-party search, GitHub, hosting, and allowlisted API services. Those services have their own availability, content, privacy policies, rate limits, and terms. DevNa cannot guarantee that their results are complete, current, or correct.
 
 ## No execution guarantee
 
-DevNa's automation tool produces plans only. It does not execute commands or change remote systems. The static analyzer does not run source code. Search snippets and API results should be reviewed before being used for decisions.
+Static analysis does not execute code. The automation tool drafts a plan only and does not run commands or change systems. A plan or search result is not proof that a task has been completed. Verify material technical recommendations and test code before relying on them.
 
-## Availability and liability
+## Availability and changes
 
-The service is provided on an as-available basis without a guarantee of uninterrupted availability or error-free results. To the extent permitted by law, the publisher disclaims implied warranties and liability arising from use of the service. Nothing in these terms limits rights or responsibilities that cannot legally be limited.
+The service may change, be unavailable, or be withdrawn without notice. We may limit access to protect service availability, security, and upstream services.
+
+## Disclaimer and limitation
+
+To the extent permitted by applicable law, the service is provided "as is" and "as available", without warranties that results will be uninterrupted, accurate, complete, or fit for a particular purpose. To the extent permitted by applicable law, the publisher is not liable for indirect, incidental, special, consequential, or punitive loss arising from use of the service. These terms do not exclude rights or responsibilities that cannot legally be excluded.
 
 ## Contact
 
-Support: https://github.com/Abdlnadeemmohd/DevNa/issues. Do not publish passwords, tokens, or sensitive information in an issue.
+For support, use https://github.com/Abdlnadeemmohd/DevNa/issues. Do not post credentials or sensitive data in public issues.
