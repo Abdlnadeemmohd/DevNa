@@ -43,6 +43,19 @@ class FileAnalysisTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "does not exist"):
                 analyze_path(Path(temp) / "missing.txt")
 
+    def test_symbolic_link_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "target.txt"
+            target.write_text("safe", encoding="utf-8")
+            link = root / "link.txt"
+            try:
+                link.symlink_to(target)
+            except (OSError, NotImplementedError):
+                self.skipTest("Symbolic links are unavailable in this environment.")
+            with self.assertRaisesRegex(ValueError, "symbolic link"):
+                analyze_path(link)
+
 
 if __name__ == "__main__":
     unittest.main()
