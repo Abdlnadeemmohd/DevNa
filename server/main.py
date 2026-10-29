@@ -10,6 +10,8 @@ from __future__ import annotations
 import ast
 import asyncio
 import base64
+import csv
+import io
 import json
 import os
 import re
@@ -28,6 +30,8 @@ from starlette.routing import Route
 
 APP_NAME = "DevNa Public Developer Copilot"
 MAX_TOOL_TEXT = 150_000
+MAX_TABULAR_ROWS = 5_000
+MAX_TABULAR_COLUMNS = 100
 MAX_GITHUB_FILE_BYTES = 180_000
 MAX_API_RESPONSE_BYTES = 1_000_000
 HTTP_TIMEOUT = 12.0
@@ -353,6 +357,56 @@ async def analyze_text_file(filename: str, content: str) -> str:
         except json.JSONDecodeError as exc:
             result["json_valid"] = False
             result["json_error"] = {"line": exc.lineno, "column": exc.colno, "message": exc.msg}
+    elif suffix in {".csv", ".tsv"}:
+        delimiter = "\\t" if suffix == ".tsv" else ","
+        try:
+            reader = csv.reader(io.StringIO(content, newline=""), delimiter=delimiter)
+            headers = next(reader, None)
+            if not headers or not any(str(header).strip() for header in headers):
+                result["tabular_valid"] = False
+                result["tabular_error"] = "No non-empty header row was found."
+            elif len(headers) > MAX_TABULAR_COLUMNS:
+                result["tabular_valid"] = False
+                result["tabular_error"] = f"More than {MAX_TABULAR_COLUMNS} columns are not supported."
+            else:
+                column_stats = [
+                    {"column_index": index + 1, "non_empty_cells": 0, "empty_cells": 0, "distinct_values": 0}
+                    for index in range(len(headers))
+                ]
+                distinct_values = [set() for _ in headers]
+                row_count = 0
+                truncated = False
+                for row in reader:
+                    if not row or not any(str(value).strip() for value in row):
+                        continue
+                    if len(row) > MAX_TABULAR_COLUMNS:
+                        result["tabular_valid"] = False
+                        result["tabular_error"] = f"A row contains more than {MAX_TABULAR_COLUMNS} columns."
+                        break
+                    if row_count >= MAX_TABULAR_ROWS:
+                        truncated = True
+                        break
+                    row_count += 1
+                    for index in range(len(headers)):
+                        value = row[index].strip() if index < len(row) else ""
+                        if value:
+                            column_stats[index]["non_empty_cells"] += 1
+                            distinct_values[index].add(value)
+                        else:
+                            column_stats[index]["empty_cells"] += 1
+                else:
+                    result["tabular_valid"] = True
+                if "tabular_error" not in result:
+                    for index, values in enumerate(distinct_values):
+                        column_stats[index]["distinct_values"] = len(values)
+                    result["tabular_valid"] = True
+                    result["header_column_count"] = len(headers)
+                    result["data_row_count"] = row_count
+                    result["row_limit_reached"] = truncated
+                    result["column_summary"] = column_stats
+        except csv.Error:
+            result["tabular_valid"] = False
+            result["tabular_error"] = "The delimited text could not be parsed safely."
     elif suffix == ".py":
         try:
             ast.parse(content, filename=PurePosixPath(filename).name)
