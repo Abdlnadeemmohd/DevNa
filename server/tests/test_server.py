@@ -96,6 +96,24 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result["content_echoed"])
         self.assertNotIn(content, json.dumps(result))
 
+    async def test_analyze_csv_returns_aggregate_summary_without_echoing_cells(self):
+        content = "name,city\\nAlice,Hyderabad\\nBob,Delhi\\n,Alice\\n"
+        result = json.loads(await analyze_text_file("users.csv", content))
+        self.assertTrue(result["tabular_valid"])
+        self.assertEqual(result["header_column_count"], 2)
+        self.assertEqual(result["data_row_count"], 3)
+        self.assertEqual(result["column_summary"][0]["empty_cells"], 1)
+        self.assertEqual(result["column_summary"][0]["distinct_values"], 2)
+        self.assertNotIn("Alice", json.dumps(result))
+        self.assertNotIn("Hyderabad", json.dumps(result))
+
+    async def test_analyze_tsv_uses_tab_delimiter(self):
+        content = "name\\tcity\\nAlice\\tHyderabad\\n"
+        result = json.loads(await analyze_text_file("users.tsv", content))
+        self.assertTrue(result["tabular_valid"])
+        self.assertEqual(result["header_column_count"], 2)
+        self.assertEqual(result["data_row_count"], 1)
+
     async def test_analyze_invalid_python_without_execution(self):
         content = "def broken(:\n    print('not run')"
         result = json.loads(await analyze_text_file("example.py", content))
