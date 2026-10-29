@@ -88,6 +88,31 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
             "draft_automation_plan",
         })
 
+    async def test_tool_annotations_are_explicit_and_justified(self):
+        from mcp import Client
+
+        async with Client(mcp) as client:
+            listed = await client.list_tools()
+        expected = {
+            "web_search": True,
+            "github_get_repository": True,
+            "github_list_issues": True,
+            "github_read_file": True,
+            "analyze_text_file": False,
+            "fetch_allowlisted_api_json": True,
+            "draft_automation_plan": False,
+        }
+        tools = {tool.name: tool for tool in listed.tools}
+        self.assertEqual(set(tools), set(expected))
+        for name, open_world in expected.items():
+            annotations = tools[name].annotations
+            self.assertIsNotNone(annotations, name)
+            self.assertTrue(annotations.read_only_hint, name)
+            self.assertEqual(annotations.open_world_hint, open_world, name)
+            self.assertFalse(annotations.destructive_hint, name)
+            description = tools[name].description or ""
+            self.assertIn("Annotation justification:", description, name)
+
     async def test_analyze_json_without_echoing_input(self):
         content = '{"ok": true}\n'
         result = json.loads(await analyze_text_file("config.json", content))
