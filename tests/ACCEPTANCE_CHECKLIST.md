@@ -16,9 +16,9 @@ This checklist tracks end-to-end readiness. Unit tests cover the implemented par
 
 ## Must pass before release
 
-- [ ] All unit tests pass on supported Python versions.
-- [ ] Package installs successfully in a clean environment.
-- [ ] CI run succeeds for a branch and pull request.
+- [x] All unit tests pass on supported Python versions (3.11, 3.12, 3.13, and 3.14).
+- [x] Package installs successfully in a clean environment via CI.
+- [x] CI run succeeds for a branch push and pull request.
 - [ ] Verify GitHub API reads against a real public repository.
 - [ ] Verify private-repository access using a least-privilege test token without exposing it.
 - [ ] Verify issue creation only in a dedicated test repository and only with explicit approval.
