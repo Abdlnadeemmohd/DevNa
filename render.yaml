@@ -3,7 +3,7 @@ services:
     name: devna-public-mcp
     runtime: python
     plan: starter
-    branch: feature/devna-core-runtime
+    branch: Abd
     rootDir: server
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
