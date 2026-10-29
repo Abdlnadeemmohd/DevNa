@@ -88,6 +88,19 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result["approval_required_before_consequential_action"])
         self.assertTrue(any("approval" in step.lower() or "approval" in result["steps"][4].lower() for step in result["steps"]))
 
+    async def test_publisher_domain_challenge_requires_configured_token(self):
+        from starlette.requests import Request
+        from server.main import openai_domain_challenge
+        scope = {"type": "http", "method": "GET", "path": "/.well-known/openai-apps-challenge", "headers": [], "query_string": b"", "server": ("testserver", 443), "client": ("127.0.0.1", 1234), "scheme": "https", "root_path": ""}
+        request = Request(scope)
+        with patch.dict(os.environ, {"OPENAI_APPS_CHALLENGE": ""}):
+            response = await openai_domain_challenge(request)
+            self.assertEqual(response.status_code, 404)
+        with patch.dict(os.environ, {"OPENAI_APPS_CHALLENGE": "portal-verification-token"}):
+            response = await openai_domain_challenge(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.body.decode("utf-8"), "portal-verification-token")
+
     async def test_web_search_validates_arguments_before_network(self):
         with self.assertRaises(ValueError):
             await web_search("")
