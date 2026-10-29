@@ -1,6 +1,26 @@
 # GitHub API integration
 
-## Implemented operations
+## Generic JSON APIs
+
+The CLI can also make calls against one explicitly configured HTTPS API:
+
+```bash
+export DEVNA_API_BASE_URL="https://api.example.com"
+# Optional, only if the API requires bearer-token authentication:
+export DEVNA_API_TOKEN="YOUR_TOKEN"
+
+devna api GET /v1/items
+```
+
+To send a write request, place the JSON payload in a local file and include explicit confirmation:
+
+```bash
+devna api POST /v1/items --json-file payload.json --confirm-write
+```
+
+The generic client accepts only paths under the configured base URL, requires HTTPS, uses a timeout and response-size limit, and does not allow writes without confirmation and a token. Treat the base URL as trusted configuration. No live generic API endpoint has been configured or verified in this starter project.
+
+## GitHub operations implemented
 
 The local CLI uses Python's standard library and the fixed `https://api.github.com` host.
 
