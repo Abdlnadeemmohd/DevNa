@@ -22,7 +22,7 @@ import httpx
 from ddgs import DDGS
 from mcp.server import MCPServer
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
 
 APP_NAME = "DevNa Public Developer Copilot"
@@ -388,6 +388,15 @@ async def health_check(_request: Request) -> JSONResponse:
     return JSONResponse({"ok": True, "service": APP_NAME, "version": "0.1.0"})
 
 
+async def openai_domain_challenge(_request: Request) -> PlainTextResponse:
+    """Serve the exact challenge string supplied privately by the publisher portal."""
+    token = os.getenv("OPENAI_APPS_CHALLENGE", "").strip()
+    if not token or len(token) > 2048 or "\\n" in token or "\\r" in token:
+        return PlainTextResponse("Not configured", status_code=404)
+    return PlainTextResponse(token, media_type="text/plain")
+
+
 app = mcp.streamable_http_app()
 app.routes.append(Route("/healthz", health_check, methods=["GET"]))
+app.routes.append(Route("/.well-known/openai-apps-challenge", openai_domain_challenge, methods=["GET"]))
 app.routes.append(Route("/", health_check, methods=["GET"]))
