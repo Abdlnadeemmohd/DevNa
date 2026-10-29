@@ -358,7 +358,7 @@ async def analyze_text_file(filename: str, content: str) -> str:
             result["json_valid"] = False
             result["json_error"] = {"line": exc.lineno, "column": exc.colno, "message": exc.msg}
     elif suffix in {".csv", ".tsv"}:
-        delimiter = "\\t" if suffix == ".tsv" else ","
+        delimiter = "\t" if suffix == ".tsv" else ","
         try:
             reader = csv.reader(io.StringIO(content, newline=""), delimiter=delimiter)
             headers = next(reader, None)
