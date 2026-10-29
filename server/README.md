@@ -32,7 +32,7 @@ Health endpoint: `http://127.0.0.1:8000/healthz`
 
 1. In Render, create a new Blueprint from this repository.
 2. Select branch `feature/devna-core-runtime` for initial testing. After the pull request is merged, update the service to the chosen release branch.
-3. Review the `render.yaml` service plan and costs before creating it.
+3. Review the `render.yaml` service plan and costs before creating it. The blueprint selects a paid starter service to keep the public endpoint responsive; approve the plan and billing only if you are comfortable with the charge.
 4. Wait for deployment to be healthy.
 5. Verify `https://YOUR-SERVICE.onrender.com/healthz` and use an MCP client to enumerate and test tools at `https://YOUR-SERVICE.onrender.com/mcp`.
 6. For publisher domain verification, set the exact token shown by the plugin portal as the Render environment variable `OPENAI_APPS_CHALLENGE`. The server then serves it as plain text at `/.well-known/openai-apps-challenge`. Keep the token in the hosting dashboard, never in Git.
