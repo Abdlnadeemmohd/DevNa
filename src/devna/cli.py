@@ -14,6 +14,7 @@ from devna import __version__
 from devna.automation import run_verification
 from devna.file_analysis import analyze_path
 from devna.github_api import GitHubAPIError, create_issue, get_repository, list_issues
+from devna.rest_client import request_json
 
 
 def _print_json(value: Any) -> None:
@@ -52,6 +53,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--confirm-public-write",
         action="store_true",
         help="confirm the issue should be created on GitHub",
+    )
+
+    api_parser = subparsers.add_parser("api", help="call a configured HTTPS JSON API")
+    api_parser.add_argument("method", choices=("GET", "POST", "PUT", "PATCH", "DELETE"))
+    api_parser.add_argument("path", help="path under DEVNA_API_BASE_URL, such as /v1/items")
+    api_parser.add_argument("--json-file", help="read a JSON request payload from this local file")
+    api_parser.add_argument(
+        "--confirm-write",
+        action="store_true",
+        help="confirm the external API write for POST, PUT, PATCH, or DELETE",
     )
 
     automate_parser = subparsers.add_parser("automate", help="preview or run fixed local checks")
@@ -112,6 +123,18 @@ def main(argv: list[str] | None = None) -> int:
                     "note": "Issue creation was requested with explicit confirmation.",
                 })
                 return 0
+
+        if args.command == "api":
+            payload = None
+            if args.json_file:
+                payload = json.loads(Path(args.json_file).read_text(encoding="utf-8"))
+            _print_json(request_json(
+                args.path,
+                method=args.method,
+                payload=payload,
+                confirmed=args.confirm_write,
+            ))
+            return 0
 
         if args.command == "automate" and args.automation_command == "verify":
             result = run_verification(Path(args.root), execute=args.execute)
