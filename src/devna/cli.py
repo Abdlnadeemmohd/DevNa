@@ -14,7 +14,7 @@ from devna import __version__
 from devna.automation import run_verification
 from devna.file_analysis import analyze_path
 from devna.github_api import GitHubAPIError, create_issue, get_repository, list_issues
-from devna.rest_client import request_json
+from devna.rest_client import RestAPIError, request_json
 
 
 def _print_json(value: Any) -> None:
@@ -143,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
 
         _print_json({"error": "Unsupported command."})
         return 2
-    except (ValueError, GitHubAPIError, OSError) as exc:
+    except (ValueError, GitHubAPIError, RestAPIError, OSError) as exc:
         _print_json({"error": str(exc)})
         return 2
 
