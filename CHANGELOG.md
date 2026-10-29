@@ -4,5 +4,12 @@ Notable repository changes are documented here.
 
 ## Unreleased
 
-- Establish project overview, development guidance, security policy, and an initial acceptance checklist.
-- Preserve the existing ChatGPT plugin identity separately from this source repository.
+- Add an early Python CLI package for local project inspection.
+- Add safe GitHub REST API reads and explicit-confirmation issue creation.
+- Add a dry-run-first local verification workflow.
+- Add unit tests and a GitHub Actions validation workflow.
+- Keep plugin platform identity and source repository metadata separate.
+
+## 0.1.0
+
+- Initial public repository scaffold and project guidance.
