@@ -41,7 +41,7 @@ For private repository access or issue creation, configure a least-privilege Git
 
 The separate submission package lives in [`public-plugin/`](public-plugin/). It includes the manifest, five skills, listing icons, draft privacy/terms pages, and five positive/three negative reviewer cases. `mcp.json.template` intentionally contains a placeholder until the server has a real URL.
 
-The final ZIP must be built after the server is deployed and a demo has actually been recorded:
+The final ZIP must be built after the server is deployed and a demo has actually been recorded. After merging the PR, the one-click builder is available under GitHub Actions → **Build public DevNa plugin ZIP**:
 
 ```bash
 python scripts/validate_public_plugin.py
