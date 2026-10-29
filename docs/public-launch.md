@@ -31,21 +31,24 @@ It intentionally has no private-repository access, write operations, arbitrary s
 
 ## Build the upload ZIP
 
-The public package manifest, skills, listing icon, privacy-policy draft, terms draft, and reviewer test cases are under `public-plugin/`.
+The public package manifest, skills, listing icons, privacy policy, terms of use, reviewer test cases, and demo-recording script are under `public-plugin/`.
 
 Record an accessible walkthrough video only after the live service has been tested. Then set these variables in your terminal:
 
 - `DEVNA_MCP_URL`: the deployed stable HTTPS endpoint ending in `/mcp`.
 - `DEVNA_DEMO_RECORDING_URL`: HTTPS link to the actual reviewer-accessible walkthrough video.
 
-Run:
+Recommended: after merging the reviewed source into default branch `Abd`, open GitHub Actions → **Build public DevNa plugin ZIP** → **Run workflow**. Enter the actual deployed `/mcp` endpoint and the actual reviewer-accessible demo video URL. The workflow validates the package, runs the public-payload secret scan, checks the live `/healthz` endpoint, and uploads a short-lived artifact named `devna-public-plugin-1.0.0`. Download that artifact and inspect its ZIP contents before uploading.
+
+Alternatively, in a local checkout set `DEVNA_MCP_URL` and `DEVNA_DEMO_RECORDING_URL`, then run:
 
 ```bash
 python scripts/validate_public_plugin.py
+python scripts/check_public_secrets.py
 python scripts/build_public_plugin.py
 ```
 
-The builder checks the live `/healthz` endpoint, injects the actual MCP and demo URLs, and writes `dist/devna-public-1.0.0.zip`. Do not hand-edit the packaged endpoint after validation. Inspect the ZIP and the final manifest before uploading.
+The builder injects the actual MCP and demo URLs and writes `dist/devna-public-1.0.0.zip`. It refuses placeholder endpoints or missing demo links. It cannot prove that the demo is publicly accessible or that the portal tool scan will pass, so confirm those separately. Do not hand-edit the packaged endpoint after validation.
 
 ## OpenAI public submission steps
 
@@ -60,7 +63,7 @@ Do not claim public availability until the portal confirms that publication is c
 
 ## Publisher-owned tasks that cannot be safely automated from this repository
 
-- Create the Render service in your account and approve any billing.
+- Create the Render service in your account and approve any billing. This repository does not deploy or pay for hosting on your behalf.
 - Keep the public service available and monitor logs/usage.
 - Record the actual demo walkthrough and provide its URL.
 - Complete individual/business identity verification and legal/policy attestations.
