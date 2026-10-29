@@ -46,6 +46,9 @@ devna github repo octocat/Hello-World
 # List open issues
 devna github issues octocat/Hello-World --limit 10
 
+# Call a trusted HTTPS JSON API (configure DEVNA_API_BASE_URL)
+devna api GET /v1/items
+
 # Preview the fixed verification workflow
 devna automate verify --root .
 
@@ -53,7 +56,9 @@ devna automate verify --root .
 devna automate verify --root . --execute
 ```
 
-For issue creation, configure `GITHUB_TOKEN` or `GH_TOKEN` in your shell and request the write explicitly:
+For a generic JSON API, set `DEVNA_API_BASE_URL` to its trusted HTTPS base URL. Set `DEVNA_API_TOKEN` only when that API needs bearer-token authentication. Read-only requests use the `devna api GET /path` command. Requests that change remote state require `--confirm-write`; see [API integration](docs/api-integration.md).
+
+For GitHub issue creation, configure `GITHUB_TOKEN` or `GH_TOKEN` in your shell and request the write explicitly:
 
 ```bash
 devna github create-issue OWNER/REPO --title "Bug report" --body "Describe the problem." --confirm-public-write
