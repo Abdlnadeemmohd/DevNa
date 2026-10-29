@@ -55,7 +55,7 @@ class PublicMCPValidationTests(unittest.TestCase):
 
     def test_transport_security_uses_render_external_hostname(self):
         from mcp.server.transport_security import TransportSecuritySettings
-        with patch.dict(os.environ, {"RENDER_EXTERNAL_HOSTNAME": "devna-example.onrender.com"}, clear=True):
+        with patch.dict(os.environ, {"DEVNA_PUBLIC_HOST": "", "RENDER_EXTERNAL_HOSTNAME": "devna-example.onrender.com"}, clear=True):
             settings = _mcp_transport_security()
         self.assertIsInstance(settings, TransportSecuritySettings)
         self.assertEqual(settings.allowed_hosts, ["devna-example.onrender.com", "devna-example.onrender.com:*"])
@@ -140,7 +140,7 @@ class PublicMCPToolTests(unittest.IsolatedAsyncioTestCase):
             result = json.loads(await web_search("asyncio timeouts", max_results=3))
         self.assertEqual(result["result_count"], 1)
         self.assertEqual(result["results"][0]["url"], "https://docs.python.org/3/library/asyncio.html")
-        self.assertIn("verify", result["note"])
+        self.assertIn("verify", result["note"].lower())
 
     async def test_github_repository_tool_uses_public_data_fields(self):
         from unittest.mock import AsyncMock
