@@ -19,7 +19,7 @@ This checklist tracks end-to-end readiness. Unit tests cover the implemented par
 - [x] All unit tests pass on supported Python versions (3.11, 3.12, 3.13, and 3.14).
 - [x] Package installs successfully in a clean environment via CI.
 - [x] CI run succeeds for a branch push and pull request.
-- [ ] Verify GitHub API reads against a real public repository (covered by the CI smoke-test job; awaiting the latest run).
+- [x] Verify GitHub API reads against a real public repository (live CI smoke test succeeded against `octocat/Hello-World`).
 - [ ] Verify private-repository access using a least-privilege test token without exposing it.
 - [ ] Verify issue creation only in a dedicated test repository and only with explicit approval.
 - [ ] Review error behavior for network failures, API rate limits, expired credentials, and insufficient permissions.
