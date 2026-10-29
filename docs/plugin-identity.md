@@ -2,7 +2,7 @@
 
 ## Current source baseline
 
-The existing ChatGPT plugin is named `devna`, is at version `1.0.1`, and has private discoverability. Its backend identity is managed by the plugin platform, not by this Git repository.
+The existing ChatGPT plugin is named `devna`, is at version `1.0.2`, and has private discoverability. Version 1.0.2 was verified after updating the existing plugin in place. Its backend identity is managed by the plugin platform, not by this Git repository.
 
 The source manifests in this repository describe the package name and version. They do **not** create a new plugin identity.
 
